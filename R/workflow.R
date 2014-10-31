@@ -5,7 +5,7 @@ for(file in list.files())
   if(file != "workflow.R" && tolower(substr(x = file, start = nchar(file) - 1, stop = nchar(file))) == ".r")
     source(file)
 
-for(dir in c("../auc", "../pvals", "../roc", "../simulations"))
+for(dir in c("../auc",  "../log", "../pvals", "../roc", "../simulations"))
   if(!file.exists(dir))
     dir.create(dir)
 
@@ -28,9 +28,9 @@ if(host == "impact1.stat.iastate.edu"){
 #s = proc.time()
 #simulate.datasets(which.datasets)
 #t = proc.time()
-#print(t - s)
+#logfile("Time spent simulating datasets:", t - s)
 
 s = proc.time()
 compute.pvals(which.datasets, ncpus)
 t = proc.time()
-print(t - s)
+logfile("Time spent computing pvals:", t - s)

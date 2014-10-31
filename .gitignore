@@ -10,9 +10,9 @@
 .DS_Store
 .Rapp.history
 .Rhistory
-local
-simulations/*.rds
-pvals/*.rds
-roc/*.rds
-auc/*.rds
-packages/
+auc/
+pvals/
+local/
+log/
+roc/
+simulations/

@@ -3,6 +3,7 @@ pvals1dataset = function(counts, group, ncpus = 2){
   pvals = list()
 
   # edgeR
+  logfile("  edgeR")
 
   dge <- DGEList(counts = counts, group = group)
   design <- model.matrix(~ -1 + group)
@@ -33,6 +34,7 @@ pvals1dataset = function(counts, group, ncpus = 2){
   })
 
 # baySeq
+  logfile("  baySeq")
 
   models = list(
     m111 = rep(1, length(group)),
@@ -55,6 +57,7 @@ pvals1dataset = function(counts, group, ncpus = 2){
   stopCluster(cl)
 
 # ShrinkBayes
+  logfile("  shrinkBayes")
 
   phi = rep(1, length(group))
   alp = (group == 3) - (group == 1)
