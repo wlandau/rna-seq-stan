@@ -15,13 +15,13 @@ if(host == "impact1.stat.iastate.edu"){
   ncpus = 4
  # which.datasets = 1:33
 } else if(host == "impact2.stat.iastate.edu"){ 
-  ncpus = 6
+  ncpus = 4
   which.datasets = 1:33
 } else if(host == "impact3.stat.iastate.edu") {
-  ncpus = 6
+  ncpus = 4
   which.datasets = 34:66
 } else if(host == "impact4.stat.iastate.edu") {
-  ncpus = 6
+  ncpus = 4
   which.datasets = 67:100
 }
 
