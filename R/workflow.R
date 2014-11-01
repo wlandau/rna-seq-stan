@@ -13,16 +13,16 @@ host = System$getHostname()
 
 if(host == "impact1.stat.iastate.edu"){
   ncpus = 4
-  which.datasets = 1:25
+ # which.datasets = 1:33
 } else if(host == "impact2.stat.iastate.edu"){ 
-  ncpus = 5
-  which.datasets = 26:65  
+  ncpus = 6
+  which.datasets = 1:33
 } else if(host == "impact3.stat.iastate.edu") {
-  ncpus = 2
-  which.datasets = 66:75
+  ncpus = 6
+  which.datasets = 34:66
 } else if(host == "impact4.stat.iastate.edu") {
-  ncpus = 5
-  which.datasets = 76:100
+  ncpus = 6
+  which.datasets = 67:100
 }
 
 #s = proc.time()
