@@ -17,9 +17,37 @@ roc = function(pvals, truth, upper = 1e-1, npoints = 1e3){
   fpr = cutoffs*upper
   tpr = stepf(fpr)
 
-  as.data.frame(fdr = fdr, tpr = tpr)
+  data.frame(fpr = fpr, tpr = tpr)
+}
+
+rocs = function(which.datasets = 1:100){
+  for(pkg in c("edgeR")){ #, "baySeq", "shrinkBayes")){
+    for(i in which.datasets){
+      pvals = readRDS(paste("../pvals/", pkg, i, ".rds", sep=""))
+      truth = readRDS(paste("../simulations/truth", i, ".rds", sep=""))^2
+      saveRDS(roc(pvals, truth), paste("../roc/", pkg, i, ".rds", sep=""))
+    }
+  }
 }
 
 auc = function(.roc){
   trapz(x = .roc$fpr, y = .roc$tpr)
+}
+
+aucs = function(which.datasets = 1:100){
+  auc.list = list()
+  for(pkg in c("edgeR")){ 
+    ret[[pkg]] = c()
+    for(i in which.datasets){
+      .roc = readRDS(paste("../roc/", pkg, i, ".rds", sep=""))
+      auc.list[[pkg]] = c(auc.list[[pkg]], auc(.roc))
+    }   
+  }
+  
+  ret = data.frame(
+    auc = c(auc.list[["edgeR"]]),
+    pkg = rep(c("edgeR"), each = length(which.datasets))
+  )
+  
+  saveRDS(ret, "../auc/auc")
 }
