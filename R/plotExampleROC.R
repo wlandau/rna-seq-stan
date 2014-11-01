@@ -2,8 +2,8 @@ plotExampleROC = function(file = "../roc/edgeR1.rds"){
   r = readRDS(file)
   pl = ggplot(r, aes(x = fpr, y = tpr), na.rm=TRUE) + 
     geom_line() +
-    xlab("False positive rate (FPR)") + 
-    ylab("True positive rate (TPR)") +
+    xlab("\nFalse positive rate (FPR)") + 
+    ylab("True positive rate (TPR)\n") +
     theme(text = element_text(family = "Helvetica", size = 12, colour= "black", face="plain"),
           legend.title= element_text(family = "Helvetica", size=12, face="plain"),
           axis.text = element_text(family = "Helvetica", colour = 'black'),
