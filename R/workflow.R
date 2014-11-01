@@ -5,3 +5,7 @@ source("setup.R")
 
 #simulator(which.datasets)
 pvals(which.datasets, ncpus)
+rocs()
+aucs()
+plotExampleROC()
+plotAUC()
