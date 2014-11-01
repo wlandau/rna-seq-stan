@@ -12,17 +12,17 @@ for(dir in c("../auc",  "../log", "../pvals", "../roc", "../simulations"))
 host = System$getHostname()
 
 if(host == "impact1.stat.iastate.edu"){
-  ncpus = 2
-  which.datasets = 1:15
+  ncpus = 4
+  which.datasets = 1:25
 } else if(host == "impact2.stat.iastate.edu"){ 
   ncpus = 5
-  which.datasets = 16:50  
+  which.datasets = 26:65  
 } else if(host == "impact3.stat.iastate.edu") {
   ncpus = 2
-  which.datasets = 51:65
+  which.datasets = 66:75
 } else if(host == "impact4.stat.iastate.edu") {
   ncpus = 5
-  which.datasets = 66:100
+  which.datasets = 76:100
 }
 
 #s = proc.time()
