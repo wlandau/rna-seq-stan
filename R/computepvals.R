@@ -4,6 +4,6 @@ compute.pvals = function(which.datasets = 1:100, ncpus = 2){
     logfile("Calculating p-values for dataset", i)
     cts = readRDS(paste("../simulations/sim", i, ".rds", sep=""))
     pv = pvals1dataset(cts, group, ncpus = ncpus)
-    saveRDS(paste("../pvals/pvals", i, ".rds", sep=""))
+    saveRDS(pv, paste("../pvals/pvals", i, ".rds", sep=""))
   }
 }
