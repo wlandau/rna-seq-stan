@@ -114,7 +114,7 @@ pvals1dataset = function(pkg, counts, group, ncpus = 2){
   }
 
   s = proc.time()
-  logfile(t - s)
+  logfile(paste(s - t, collapse = T))
   return(ret)
 }
 
