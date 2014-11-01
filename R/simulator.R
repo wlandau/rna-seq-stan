@@ -1,4 +1,4 @@
-simulate.datasets = function(which.datasets = 100){
+simulator = function(which.datasets = 100){
 
   set.seed(10292014)
 
