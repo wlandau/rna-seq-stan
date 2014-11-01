@@ -125,7 +125,7 @@ pvals = function(which.datasets = 1:100, ncpus = 2){
     for(i in which.datasets){
       logfile(pkg, "pvals data", i)
       cts = readRDS(paste("../simulations/sim", i, ".rds", sep=""))
-      saveRDS(pvals1dataset(pkg, cts, group), paste("../pvals/", pkg, i, ".rds", sep=""))
+      saveRDS(pvals1dataset(pkg, cts, group, ncpus = ncpus), paste("../pvals/", pkg, i, ".rds", sep=""))
     }
     logfile("Done with", pkg, ".\n")
   }
