@@ -1,6 +1,8 @@
-simulator = function(which.datasets = 100){
+simulator = function(which.datasets = 1:100){
 
   set.seed(10292014)
+  group = as.factor(rep(c("parent1", "parent2", "hybrid"), each = 4))
+  saveRDS(group, "../data/group.rds")
 
   initial = readRDS("../data/initial.rds") #empirical estimates from real data obtained with edgeR
   G = ncol(initial$B)
@@ -28,6 +30,7 @@ simulator = function(which.datasets = 100){
     counts.t = trimmed[[1]]
     geneid.t = trimmed[[2]]
     rownames(counts.t) = geneid.t
+    colnames(counts.t) = group
     keep = sort(sample(geneid.t,25000))
 
     saveRDS(counts.t[keep,], file=sprintf("../simulations/sim%i.rds",i))

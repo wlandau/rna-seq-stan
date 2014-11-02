@@ -10,9 +10,9 @@ edgeR.fit = function(counts, group){
 
 edgeR.ord = function(fit){
   apply(fit$coef, 1, function(x){
-    if(x[2] < min(x[c(1, 3)]))
+    if(x["grouphybrid"] < min(x[c("groupparent1", "groupparent2")]))
       return("hybrid < min")
-    else if(x[2] > max(x[c(1, 3)]))
+    else if(x["grouphybrid"] > max(x[c("groupparent1", "groupparent2")]))
       return("hybrid > max")
     else
       return("min <= hybrid <= max")
@@ -20,6 +20,7 @@ edgeR.ord = function(fit){
 }
 
 pvals1dataset = function(pkg, counts, group, ncpus = 2){
+  counts = counts[1:100,]
  
   t = proc.time()
 
@@ -27,10 +28,10 @@ pvals1dataset = function(pkg, counts, group, ncpus = 2){
     fit = edgeR.fit(counts, group)
     ord = edgeR.ord(fit)
 
-    p1 = glmLRT(fit, contrast = c(-1, 1, 0))$table$PValue
-    p3 = glmLRT(fit, contrast = c(0, 1, -1))$table$PValue
+    p1 = glmLRT(fit, contrast = (unique(group) == "hybrid") - (unique(group) == "parent1"))$table$PValue
+    p2 = glmLRT(fit, contrast = (unique(group) == "hybrid") - (unique(group) == "parent2"))$table$PValue
 
-    ret = apply(cbind(ord, p1, p3), 1, function(x){
+    ret = apply(cbind(ord, p1, p2), 1, function(x){
       if(x[1] == "min <= hybrid <= max")
         return(1)
       else if(x[1] == "hybrid < min")
@@ -42,12 +43,24 @@ pvals1dataset = function(pkg, counts, group, ncpus = 2){
 
     ord = edgeR.ord(edgeR.fit(counts, group))
 
+    p1.diff = as.vector(group)
+    p1.diff[p1.diff == "hybrid"] = p1.diff[p1.diff == "parent2"] = "others"
+    p1.diff = as.factor(p1.diff)
+
+    p2.diff = as.vector(group)
+    p2.diff[p2.diff == "hybrid"] = p2.diff[p2.diff == "parent1"] = "others"
+    p2.diff = as.factor(p2.diff)
+
+    hy.diff = as.vector(group)
+    hy.diff[hy.diff == "parent1"] = hy.diff[hy.diff == "parent2"] = "parents"
+    hy.diff = as.factor(hy.diff)
+
     models = list(
-      m111 = rep(1, length(group)),
-      m113 = c(rep(1, sum(group != 3)), rep(3, sum(group == 3))),
-      m122 = c(rep(1, sum(group == 1)), rep(2, sum(group != 1))),
-      m121 = c(rep(1, sum(group == 1)), rep(2, sum(group == 2)), rep(1, sum(group == 3))),
-      m123 = group
+      all.same = rep("same", length(group)),
+      p1.diff = p1.diff,
+      p2.diff = p2.diff,
+      hy.diff = hy.diff,
+      all.diff = group
     )
 
     cl = makeCluster(ncpus, "SOCK")
@@ -57,14 +70,14 @@ pvals1dataset = function(pkg, counts, group, ncpus = 2){
     cd = getLikelihoods.NB(cd, cl = cl)
     stopCluster(cl)
 
-    post = apply(exp(cd@posteriors)[,c("m121", "m123")], 1, sum)
+    post = apply(exp(cd@posteriors)[,c("hy.diff", "all.diff")], 1, sum)
     post[ord == "min <= hybrid <= max"] = 0
     ret = 1 - post
   } else if(pkg == "ShrinkBayes"){
 
     phi = rep(1, length(group))
-    alp = (group == 3) - (group == 1)
-    del = as.integer(group == 2)
+    alp = (group == "parent2") - (group == "parent1")
+    del = as.integer(group == "hybrid")
 
     size <- calcNormFactors(counts)
     libsize <- apply(counts, 2, sum)
@@ -114,7 +127,7 @@ pvals1dataset = function(pkg, counts, group, ncpus = 2){
   }
 
   s = proc.time()
-  logfile(paste(s - t, collapse = T))
+  logfile(paste(s - t, collapse = " "))
   return(ret)
 }
 
