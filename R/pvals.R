@@ -20,7 +20,6 @@ edgeR.ord = function(fit){
 }
 
 pvals1dataset = function(pkg, counts, group, ncpus = 2){
-  counts = counts[1:500,]
  
   t = proc.time()
 
