@@ -39,7 +39,7 @@ aucs = function(which.datasets = 1:100){
   auc.list = list()
 #  for(pkg in c("edgeR")){ 
   for(pkg in c("edgeR", "baySeq", "ShrinkBayes")){ 
-   ret[[pkg]] = c()
+   auc.list[[pkg]] = c()
     for(i in which.datasets){
       .roc = readRDS(paste("../roc/", pkg, i, ".rds", sep=""))
       auc.list[[pkg]] = c(auc.list[[pkg]], auc(.roc))
