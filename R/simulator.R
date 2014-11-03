@@ -10,6 +10,16 @@ simulator = function(which.datasets = 1:100){
   truth = with(initial,apply(B,MARGIN=2,FUN = 
                      function(x) {as.numeric(x[3] > pmax(x[2],x[1])) - 
                                         as.numeric(x[3] < pmin(x[1],x[2]))}))
+
+# UNCOMMENT BELOW TO FORCE MORE EXTREME HETEROSIS
+# initial$B = apply(initial$B, 2, function(x){
+#    if(as.numeric(x[3] > pmax(x[2],x[1])))
+#       x[3] = x[3] + 1
+#    else if(as.numeric(x[3] < pmin(x[1],x[2])))
+#       x[3] = x[3] - 1 
+#   return(x)
+#  })
+
   id = names(truth)
 
   for (i in which.datasets){
@@ -30,10 +40,12 @@ simulator = function(which.datasets = 1:100){
     counts.t = trimmed[[1]]
     geneid.t = trimmed[[2]]
     rownames(counts.t) = geneid.t
-    colnames(counts.t) = group
-    keep = sort(sample(geneid.t,25000))
+    keep = sort(sample(geneid.t, 25000))
 
-    saveRDS(counts.t[keep,], file=sprintf("../simulations/sim%i.rds",i))
-    saveRDS(truth[keep], file=sprintf("../simulations/truth%i.rds",i))
+    counts.keep = counts.t[keep,]
+    truth.keep = truth[keep]
+
+    saveRDS(counts.keep, file=sprintf("../simulations/sim%i.rds",i))
+    saveRDS(truth.keep, file=sprintf("../simulations/truth%i.rds",i))
   }
 }

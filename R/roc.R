@@ -2,37 +2,36 @@ pr = Vectorize(function(cutoff, pvals, n){
   sum(pvals <= cutoff)/n
 }, "cutoff")
 
-roc = function(pvals, truth, upper = 1e-1, npoints = 1e3){
-  truth = truth[order(pvals)]
-  pvals = sort(pvals)
-  cutoffs = 1:npoints/npoints
+roc = function(pv, truth){
+  truth = truth[order(pv)]
+  pv = sort(pv)
 
-  pvals.false = pvals[truth == 0]
-  pvals.true = pvals[truth == 1]
+  pvals.false = pv[truth == 0]
+  pvals.true = pv[truth != 0]
 
-  fpr = pr(cutoffs, pvals.false, length(pvals.false))
-  tpr = pr(cutoffs, pvals.true, length(pvals.true))
-
-  stepf <- stepfun(x = fpr, y = c(0, tpr))
-  fpr = cutoffs*upper
-  tpr = stepf(fpr)
+  fpr = pr(pv, pvals.false, length(pvals.false))
+  tpr = pr(pv, pvals.true, length(pvals.true))
 
   data.frame(fpr = fpr, tpr = tpr)
 }
 
-rocs = function(which.datasets = 1:100, upper = 1e-1){
+rocs = function(which.datasets = 1:100){
 #  for(pkg in c("edgeR")){
   for(pkg in c("edgeR", "baySeq", "ShrinkBayes")){
     for(i in which.datasets){
+      logfile(pkg, "ROC dataset", i)
       pvals = readRDS(paste("../pvals/", pkg, i, ".rds", sep=""))
       truth = readRDS(paste("../simulations/truth", i, ".rds", sep=""))^2
-      saveRDS(roc(pvals, truth, upper = upper), paste("../roc/", pkg, i, ".rds", sep=""))
+      saveRDS(roc(pvals, truth), paste("../roc/", pkg, i, ".rds", sep=""))
     }
   }
 }
 
-auc = function(.roc){
-  trapz(x = .roc$fpr, y = .roc$tpr)
+auc = function(.roc, upper = 1e-1){
+  m = max(which(.roc$fpr <= upper))
+  u = 2:m
+  l = 1:(m - 1)
+  sum(.roc$tpr[l] * (.roc$fpr[u] - .roc$fpr[l]))
 }
 
 aucs = function(which.datasets = 1:100){
@@ -41,6 +40,7 @@ aucs = function(which.datasets = 1:100){
   for(pkg in c("edgeR", "baySeq", "ShrinkBayes")){ 
    auc.list[[pkg]] = c()
     for(i in which.datasets){
+      logfile(pkg, "AUC dataset", i)
       .roc = readRDS(paste("../roc/", pkg, i, ".rds", sep=""))
       auc.list[[pkg]] = c(auc.list[[pkg]], auc(.roc))
     }   

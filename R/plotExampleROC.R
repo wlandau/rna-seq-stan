@@ -1,5 +1,7 @@
-plotExampleROC = function(file = "../roc/edgeR1.rds"){
+plotExampleROC = function(file = "../roc/edgeR1.rds", upper = 1e-1){
   r = readRDS(file)
+  r = r[r$fpr <= upper,]
+
   pl = ggplot(r, aes(x = fpr, y = tpr), na.rm=TRUE) + 
     geom_line() +
     xlab("\nFalse positive rate (FPR)") + 

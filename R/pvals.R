@@ -25,18 +25,22 @@ pvals1dataset = function(pkg, counts, group, ncpus = 2){
 
   if(pkg == "edgeR"){
     fit = edgeR.fit(counts, group)
-    ord = edgeR.ord(fit)
 
     p1 = glmLRT(fit, contrast = (unique(group) == "hybrid") - (unique(group) == "parent1"))$table$PValue
     p2 = glmLRT(fit, contrast = (unique(group) == "hybrid") - (unique(group) == "parent2"))$table$PValue
 
-    ret = apply(cbind(ord, p1, p2), 1, function(x){
-      if(x[1] == "min <= hybrid <= max")
+    ret = apply(cbind(fit$coef, p1, p2), 1, function(x){
+      if(x["grouphybrid"] < x["groupparent1"] && x["groupparent1"] <= x["groupparent2"]){
+        return(x["p1"]/2)
+      } else if(x["grouphybrid"] < x["groupparent2"] && x["groupparent2"] <= x["groupparent1"]){
+        return(x["p2"]/2)
+      } else if(x["grouphybrid"] > x["groupparent1"] && x["groupparent1"] >= x["groupparent2"]){
+        return(x["p1"]/2)
+      } else if(x["grouphybrid"] > x["groupparent2"] && x["groupparent2"] >= x["groupparent1"]){
+        return(x["p2"]/2)
+      } else {
         return(1)
-      else if(x[1] == "hybrid < min")
-        return(min(as.numeric(x[2:3]))/2)
-      else if(x[1] == "hybrid > max")
-        return(max(as.numeric(x[2:3]))/2)
+      }
     })
   } else if(pkg == "baySeq"){
 
@@ -69,7 +73,7 @@ pvals1dataset = function(pkg, counts, group, ncpus = 2){
     cd = getLikelihoods.NB(cd, cl = cl)
     stopCluster(cl)
 
-    post = apply(exp(cd@posteriors)[,c("hy.diff", "all.diff")], 1, sum)
+    post = apply(exp(cd@posteriors)[, c("hy.diff", "all.diff")], 1, sum)
     post[ord == "min <= hybrid <= max"] = 0
     ret = 1 - post
   } else if(pkg == "ShrinkBayes"){
