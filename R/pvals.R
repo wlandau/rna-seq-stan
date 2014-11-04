@@ -134,14 +134,17 @@ pvals1dataset = function(pkg, counts, group, ncpus = 2){
   return(ret)
 }
 
-pvals = function(which.datasets = 1:100, ncpus = 2){
-  group = readRDS("../data/group.rds")
+pvals = function(which.datasets = 1:10, ncpus = 2, sample.sizes){
   
   for(pkg in c("edgeR", "baySeq", "ShrinkBayes")){
-    for(i in which.datasets){
-      logfile(pkg, "pvals data", i)
-      cts = readRDS(paste("../simulations/sim", i, ".rds", sep=""))
-      saveRDS(pvals1dataset(pkg, cts, group, ncpus = ncpus), paste("../pvals/", pkg, i, ".rds", sep=""))
+    for(sample.size in sample.sizes){
+      group = as.factor(rep(c("parent1", "parent2", "hybrid"), each = sample.size))
+
+      for(i in which.datasets){
+        logfile(pkg, "pvals data", i, sample.size)
+        cts = readRDS(paste("../simulations/sim", i, "-", sample.size,".rds", sep=""))
+        saveRDS(pvals1dataset(pkg, cts, group, ncpus = ncpus), paste("../pvals/", pkg, i, "-", sample.size, ".rds", sep=""))
+      }
     }
     logfile("Done with", pkg, ".\n")
   }
