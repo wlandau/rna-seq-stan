@@ -1,6 +1,7 @@
-simulator = function(which.datasets = 1:100){
+simulator = function(which.datasets = 1:20){
 
   set.seed(10292014)
+  seeds = sample.int(1e8, 20)
   group = as.factor(rep(c("parent1", "parent2", "hybrid"), each = 4))
   saveRDS(group, "../data/group.rds")
 
@@ -24,7 +25,7 @@ simulator = function(which.datasets = 1:100){
 
   for (i in which.datasets){
     print(paste("Simulating dataset", i))
-
+    set.seed(seeds[i])
     print("  Calling ldply")
     df <-
       ldply(1:G,function(x){
