@@ -15,14 +15,16 @@ roc = function(pv, truth){
   data.frame(fpr = fpr, tpr = tpr)
 }
 
-rocs = function(which.datasets = 1:100){
-#  for(pkg in c("edgeR")){
-  for(pkg in c("edgeR", "baySeq", "ShrinkBayes")){
-    for(i in which.datasets){
-      logfile(pkg, "ROC dataset", i)
-      pvals = readRDS(paste("../pvals/", pkg, i, ".rds", sep=""))
-      truth = readRDS(paste("../simulations/truth", i, ".rds", sep=""))^2
-      saveRDS(roc(pvals, truth), paste("../roc/", pkg, i, ".rds", sep=""))
+rocs = function(which.datasets = 1:10, which.sizes = c(4, 8, 16), pkgs = c("edgeR", "baySeq", "ShrinkBayes")){
+  for(pkg in pkgs){
+    for(s in which.sizes){
+      for(i in which.datasets){
+        print(paste(s, i))      
+        logfile(pkg, "ROC dataset", i, s)
+        pvals = readRDS(paste("../pvals/", pkg, i, "-", s, ".rds", sep=""))
+        truth = readRDS(paste("../simulations/truth", i, "-", s, ".rds", sep=""))^2
+        saveRDS(roc(pvals, truth), paste("../roc/", pkg, i, "-", s, ".rds", sep=""))
+      }
     }
   }
 }
@@ -34,24 +36,23 @@ auc = function(.roc, upper = 1e-1){
   sum(.roc$tpr[l] * (.roc$fpr[u] - .roc$fpr[l]))
 }
 
-aucs = function(which.datasets = 1:100){
-  auc.list = list()
-#  for(pkg in c("edgeR")){ 
-  for(pkg in c("edgeR", "baySeq", "ShrinkBayes")){ 
-   auc.list[[pkg]] = c()
-    for(i in which.datasets){
-      logfile(pkg, "AUC dataset", i)
-      .roc = readRDS(paste("../roc/", pkg, i, ".rds", sep=""))
-      auc.list[[pkg]] = c(auc.list[[pkg]], auc(.roc))
-    }   
+aucs = function(which.datasets = 1:10, which.sizes = c(4, 8, 16), pkgs = c("edgeR", "baySeq", "ShrinkBayes")){
+  ret = NULL
+  for(pkg in pkgs){ 
+    for(s in which.sizes){
+      for(i in which.datasets){
+        print(paste(s, i))
+        logfile(pkg, "AUC dataset", i, s)
+        .roc = readRDS(paste("../roc/", pkg, i, "-", s, ".rds", sep=""))
+        .auc = auc(.roc)
+        ret = rbind(ret, c(.auc, pkg, i, s))
+      }   
+    }
   }
-  
-  ret = data.frame(
-#    auc = c(auc.list[["edgeR"]]),
-    auc = c(auc.list[["edgeR"]], auc.list[["baySeq"]], auc.list[["ShrinkBayes"]]),
-#    pkg = rep(c("edgeR"), each = length(which.datasets))
-    pkg = rep(c("edgeR", "baySeq", "ShrinkBayes"), each = length(which.datasets))
-  )
+
+  ret = data.frame(ret)
+  colnames(ret) = c("AUC", "Method", "Replicate", "SampleSize")
+  ret$AUC = as.numeric(as.vector(ret$AUC))
   
   saveRDS(ret, "../auc/auc.rds")
 }
