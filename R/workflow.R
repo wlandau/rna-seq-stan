@@ -3,9 +3,12 @@
 
 source("setup.R")
 
-#simulator(which.datasets)
-pvals(which.datasets, ncpus)
-rocs(which.datasets)
-aucs(1:100)
-plotExampleROC()
-plotAUC()
+#for(sample.size in sample.sizes)
+#  simulator(sample.size = sample.size)
+
+pvals(which.datasets, ncpus, sample.sizes)
+#rocs(which.datasets, sample.sizes)
+#aucs(which.datasets, sample.sizes)
+
+#plotExampleROC()
+#plotAUC()
