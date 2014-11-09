@@ -31,5 +31,5 @@ plotAUC = function(file = "../auc/auc.rds"){
                     panel.grid.major = element_line(color="lightgray"),
                     text = element_text(family = "Helvetica", colour= "black"))
     
-    ggsave("../fig/auc.pdf", pl, width = 5, height = 5, dpi = 1600)
+    ggsave("../fig/auc.pdf", pl, width = 8, height = 5, dpi = 1600)
 }
