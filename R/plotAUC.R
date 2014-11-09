@@ -4,6 +4,7 @@ plotAUC = function(file = "../auc/auc.rds"){
   a$AUC = as.numeric(as.vector(a$AUC))
   a$Method = factor(a$Method, levels = c("edgeR", "ShrinkBayes", "baySeq"))
   a$SampleSize = factor(a$SampleSize, levels = c(4, 8, 16))
+  a$SampleSize = revalue(a$SampleSize, c("4" = "4 samples per group", "8" = "8 samples per group", "16" = "16 samples per group"))
 
   df = ddply(a, .variables = .(Method, SampleSize), .fun = function(x){
     c(mean(x$AUC), quantile(x$AUC, c(0.025, 0.975)))
