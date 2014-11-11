@@ -29,7 +29,7 @@ simulator = function(which.datasets = 1:10, sample.size = 4, n.keep = 25000){
     print("  Calling ldply")
     df <-
       ldply(1:G,function(x){
-        mu = exp(rep(initial$B[,x],each=sample.size)+initial$c)
+        mu = exp(rep(initial$B[,x],each=sample.size) + rep(initial$c, each = sample.size / 4))
         y=rnbinom(3*sample.size,mu=mu,size=exp(-initial$lpsi[x]))
         t(y)
       })
