@@ -10,5 +10,4 @@ pvals(which.datasets, ncpus, sample.sizes)
 #rocs(which.datasets, sample.sizes)
 #aucs(which.datasets, sample.sizes)
 
-#plotExampleROC()
-#plotAUC()
+makePlots()
