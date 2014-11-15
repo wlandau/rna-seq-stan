@@ -1,0 +1,170 @@
+\documentclass[handout]{beamer}
+\usetheme{Marburg}
+\useoutertheme{infolines}
+\newcommand{\answers}{1}
+
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{mathrsfs}
+\usepackage{setspace}
+\usepackage{tikz}
+\usepackage{tkz-graph}
+\usepackage{url}
+
+\providecommand{\all}{\ \forall \ }
+\providecommand{\bs}{\backslash}
+\providecommand{\e}{\varepsilon}
+\providecommand{\E}{\ \exists \ }
+\providecommand{\lm}[2]{\lim_{#1 \rightarrow #2}}
+\providecommand{\m}[1]{\mathbb{#1}}
+\providecommand{\mc}[1]{\mathcal{#1}}
+\providecommand{\nv}{{}^{-1}}
+\providecommand{\ov}[1]{\overline{#1}}
+\providecommand{\p}{\newpage}
+\providecommand{\q}{$\quad$ \newline}
+\providecommand{\rt}{\rightarrow}
+\providecommand{\Rt}{\Rightarrow}
+\providecommand{\vc}[1]{\boldsymbol{#1}}
+\providecommand{\wh}[1]{\widehat{#1}}
+
+\hypersetup{colorlinks,linkcolor=,urlcolor=blue}
+\numberwithin{equation}{section}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  language=C,                % the language of the code
+  basicstyle= \footnotesize,           % the size of the fonts that are used for the code
+  numbers=left,
+  numberfirstline=true,
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=lrb,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text 
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=t,                   % sets the caption-position 
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  %title=\lstname,                   % show the filename of files included with \lstinputlisting;
+  keywordstyle=\color{blue},          % keyword style
+  commentstyle=\color{gray},       % comment style
+  stringstyle=\color{dkgreen},         % string literal style
+  escapeinside={\%*}{*)},            % if you want to add LaTeX within your code
+  morekeywords={*, ...},               % if you want to add more keywords to the set
+  xleftmargin=0.053in, % left horizontal offset of caption box
+  xrightmargin=-.03in % right horizontal offset of caption box
+}
+
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\parbox{\textwidth}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}}
+\captionsetup[lstlisting]{format = listing, labelfont = white, textfont = white}
+ %For caption-free listings, comment out the 3 lines above
+ \lstset{frame = single}
+
+\title{The heterosis problem: a comparison of Eric's method with {\tt edgeR}, {\tt baySeq}, and {\tt ShrinkBayes}}
+\author{Will Landau, Eric Mittman}
+\date{\today}
+\institute{Iowa State University}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+ \AtBeginSection[]
+{
+   \begin{frame}
+       \frametitle{Outline}
+       \tableofcontents[currentsection]
+   \end{frame}
+}
+
+\section{Simulated data}
+
+\begin{frame}
+\frametitle{Simulate heterosis data with known heterosis genes}
+\begin{center}
+\includegraphics[scale=.28]{data}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Apply {\tt edgeR} to real data to get simulation parameters}
+\begin{center}
+\includegraphics[scale=.25]{parms}
+\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Truth: which genes have heterosis?}
+\begin{center}
+\includegraphics[scale=.28]{truth}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{iid negative binomial counts (parent 1)}
+\begin{center}
+\includegraphics[scale=.28]{dists}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Remove low-count rows to get 25000 features}
+\begin{center}
+\includegraphics[scale=.28]{data}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Simulation workflow}
+
+\begin{itemize}
+\item Simulate 30 datasets as above:
+\begin{itemize}
+\pause \item 10 datasets with 4 samples (libraries, columns, etc.) per group
+\item 10 with 8 per group
+\item 10 with 16 per group
+\end{itemize}
+\pause \item For each simulated dataset, test for heterosis with
+\begin{itemize}
+\item empirical Bayes with STAN (Eric's method)
+\item {\tt edgeR} 
+\item {\tt baySeq}
+\item {\tt ShrinkBayes}
+\end{itemize}
+\item Compare methods with ROC curves
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{{\tt edgeR}}
+
+\begin{itemize}
+\item Apply a loglinear model to get estimates of main effects $\mu_{f, t}$
+\begin{itemize}
+\item Feature $f = 1, \ldots, 25000$
+\item Treatment group 1 (parent), 2 (parent), 3 (hybrid)
+\end{itemize}
+\pause \item For each $f$, calculate a p-value
+\begin{itemize}
+\item p-values is 1 if $\mu_{f, 3}$ is between $\mu_{f, 1}$ and $\mu_{f, 2}$
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+
+\end{document}
