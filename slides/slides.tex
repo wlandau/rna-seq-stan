@@ -89,6 +89,29 @@
    \end{frame}
 }
 
+\section{The workflow}
+
+\begin{frame}
+\frametitle{Simulation workflow}
+
+\begin{itemize}
+\item Simulate 30 datasets as above:
+\begin{itemize}
+\pause \item 10 datasets with 4 samples (libraries, columns, etc.) per group
+\item 10 with 8 per group
+\item 10 with 16 per group
+\end{itemize}
+\pause \item For each simulated dataset, test for heterosis with
+\begin{itemize}
+\item empirical Bayes with STAN (Eric's method)
+\item {\tt edgeR} 
+\item {\tt baySeq}
+\item {\tt ShrinkBayes}
+\end{itemize}
+\item Compare methods with ROC curves
+\end{itemize}
+\end{frame}
+
 \section{Simulated data}
 
 \begin{frame}
@@ -127,26 +150,9 @@
 \end{center}
 \end{frame}
 
-\begin{frame}
-\frametitle{Simulation workflow}
+\section{The contenders}
 
-\begin{itemize}
-\item Simulate 30 datasets as above:
-\begin{itemize}
-\pause \item 10 datasets with 4 samples (libraries, columns, etc.) per group
-\item 10 with 8 per group
-\item 10 with 16 per group
-\end{itemize}
-\pause \item For each simulated dataset, test for heterosis with
-\begin{itemize}
-\item empirical Bayes with STAN (Eric's method)
-\item {\tt edgeR} 
-\item {\tt baySeq}
-\item {\tt ShrinkBayes}
-\end{itemize}
-\item Compare methods with ROC curves
-\end{itemize}
-\end{frame}
+\subsection{{\tt edgeR}}
 
 \begin{frame}
 \frametitle{{\tt edgeR}}
@@ -179,6 +185,8 @@ $p_{f, 2}/2$ & $\wh{\mu}_{f, 3} < \wh{\mu}_{f, 2} \le \wh{\mu}_{f, 1}$ or $\wh{\
 \end{frame}
 
 
+\subsection{{\tt baySeq}}
+
 \begin{frame}
 \frametitle{{\tt baySeq}}
 \begin{itemize}
@@ -196,10 +204,10 @@ $M_5$ &  All $\mu_{f, t}$'s distinct
 \end{tabular}
 \end{center}
 
-\pause \item 
+\pause \item Final posterior probabilities of heterosis:
 \begin{center}
 \begin{tabular}{l|p{4cm}}
-Final posterior probability & if... \\ \hline
+Posterior probability & if... \\ \hline
 1 & $\wh{\mu}_{f, 1} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 2}$ or $\wh{\mu}_{f, 2} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 1}$ \\
 $P(M_3 \mid \text{data}) + P(M_5 \mid \text{data})$ & otherwise
 \end{tabular}
@@ -225,23 +233,112 @@ $P(M_3 \mid \text{data}) + P(M_5 \mid \text{data})$ & otherwise
 \end{frame}
 
 
+\subsection{{\tt ShrinkBayes}}
+
 \begin{frame}
 \frametitle{{\tt ShrinkBayes}}
 
 
-\tiny
+\begin{center}
 \begin{tabular}{c|c|c}
 $\phi_f$ & $\alpha_f$ & $\delta_f$ \\ \hline
 parental mean & half parental difference & hybrid effect
 \end{tabular}
-
+\end{center}
 \normalsize
 
 \begin{itemize}
-\item 
+\item Use contrasts to calculate final posterior probabilities of heterosis:
+
+\begin{center}
+\begin{tabular}{l|l}
+Posterior probability & if... \\ \hline
+0 & $|\delta_f| < |\alpha_f|$, otherwise: \\
+$P(\delta_f + \alpha_f > 0 \mid \text{data})$ & $\delta_f > -\alpha_f$ \\
+$P(\delta_f - \alpha_f > 0 \mid \text{data})$ & $\delta_f > \alpha_f$ \\
+$P(\delta_f - \alpha_f < 0 \mid \text{data})$ & $\delta_f < \alpha_f$ \\
+$P(\delta_f + \alpha_f < 0 \mid \text{data})$ & $\delta_f < -\alpha_f$ \\
+\end{tabular}
+\end{center}
+
+\end{itemize}
+\end{frame}
+
+\section{The contest}
+
+\subsection{ROC (receiver operating characteristic) curves}
+
+\begin{frame}
+\frametitle{Calculating false positive rate (FPR) and true positive rate (TPR)}
+
+\begin{itemize}
+\item $N_{\text{true}}$ heterosis features, $N_{\text{false}}$ null features.
+\pause \item Results of testing each feature for heterosis (25000 columns here):
 \end{itemize}
 
+\begin{tabular}{l|l|l|l|l|l|l|l}
+pval & 0.802 & 0.935 & 0.539 & 0.001 & $\cdots$ & 0.500 &  0.603  \\ \hline
+truth &  0 & 0 & 1 & 1 & $\cdots$ & 1 & 0 
+\end{tabular}
 
+\begin{itemize}
+
+\pause \item Sort table by p-value (or other binary classifier)
+\end{itemize}
+
+\begin{tabular}{l|l|l|l|l|l|l|l}
+pval & 0.000 & 0.001 & 0.005 & 0.006 & $\cdots$ & 0.901 & 1.000  \\ \hline
+truth &  1 & 1 & 0 & 1 & $\cdots$ & 0 & 0
+\end{tabular}
+\end{frame}
+
+\begin{frame}
+\frametitle{Calculating false positive rate (FPR) and true positive rate (TPR)}
+
+\begin{itemize}
+\pause \item In practice, we would declare the lowest-p-value features to have heterosis.
+\end{itemize}
+
+\pause \begin{tabular}{l|l|l|l|l|l|l|l}
+pval & {\color{blue} 0.000} & {\color{blue}0.001} & {\color{blue}0.005} & 0.006 & $\cdots$ & 0.901 & 1.000  \\ \hline
+truth & {\color{blue}1} & {\color{blue}1} & {\color{blue}0} & 1 & $\cdots$ & 0 & 0
+\end{tabular}
+
+\begin{itemize}
+\pause \item With 2 heterosis genes and 1 null gene,
+
+\begin{align*}
+FPR = \frac{1}{N_{false}} \qquad TPR = \frac{2}{N_{true}}
+\end{align*}
+
+\pause \item Repeat for multiple cutoffs to get multiple (FPR, TPR) pairs.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example ROC curves}
+\begin{center}
+\includegraphics[scale=0.5]{roc}
+\end{center}
+\end{frame}
+
+
+
+\subsection{The results}
+
+\begin{frame}
+\frametitle{Areas under ROC curves}
+\begin{center}
+\includegraphics[scale=0.5]{auc1}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Areas under ROC curves}
+\begin{center}
+\includegraphics[scale=0.5]{auc2}
+\end{center}
 \end{frame}
 
 \end{document}
