@@ -152,19 +152,96 @@
 \frametitle{{\tt edgeR}}
 
 \begin{itemize}
-\item Apply a loglinear model to get estimates of main effects $\mu_{f, t}$
+\item Fit a loglinear model to estimate main effects $\mu_{f, t}$
 \begin{itemize}
 \item Feature $f = 1, \ldots, 25000$
 \item Treatment group 1 (parent), 2 (parent), 3 (hybrid)
 \end{itemize}
-\pause \item For each $f$, calculate a p-value
-\begin{itemize}
-\item p-values is 1 if $\mu_{f, 3}$ is between $\mu_{f, 1}$ and $\mu_{f, 2}$
-\end{itemize}
+\pause \item Likelihood ratio tests to get p-values $p_{f, 1}, \ p_{f, 2}$
+
+\begin{align*}
+H_{0, 1}: \mu_{f, 3} &= \mu_{f, 1} \qquad H_{a, 1}: \mu_{f, 3} \ne \mu_{f, 1} \\
+H_{0, 2}: \mu_{f, 3} &= \mu_{f, 2} \qquad H_{a, 2}: \mu_{f, 3} \ne \mu_{f, 2}
+\end{align*}
+
+
+\pause \item 
+\begin{center}
+\begin{tabular}{l|c}
+Final p-value & if... \\ \hline
+$p_{f, 1}/2$ & $\wh{\mu}_{f, 3} < \wh{\mu}_{f, 1} \le \wh{\mu}_{f, 2}$ or $\wh{\mu}_{f, 3} > \wh{\mu}_{f, 1} \ge \wh{\mu}_{f, 2}$ \\
+$p_{f, 2}/2$ & $\wh{\mu}_{f, 3} < \wh{\mu}_{f, 2} \le \wh{\mu}_{f, 1}$ or $\wh{\mu}_{f, 3} > \wh{\mu}_{f, 2} \ge \wh{\mu}_{f, 1}$ \\
+1 & $\wh{\mu}_{f, 1} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 2}$ or $\wh{\mu}_{f, 2} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 1}$
+\end{tabular}
+\end{center}
 
 \end{itemize}
-
 \end{frame}
 
+
+\begin{frame}
+\frametitle{{\tt baySeq}}
+\begin{itemize}
+\item Estimate main effects $\mu_{f, t}$ using {\tt edgeR}.
+\pause \item Calculate the posterior probability that each feature satisfies:
+
+\begin{center}
+\begin{tabular}{l|l}
+Model & Constraint \\ \hline
+$M_1$ & All $\mu_{f, t}$'s equal \\
+$M_2$ &  $\mu_{f, 1} = \mu_{f, 2}$ \\
+$M_3$ & $\mu_{f, 1} = \mu_{f, 3}$ \\
+$M_4$ & $\mu_{f, 2} = \mu_{f, 3}$ \\
+$M_5$ &  All $\mu_{f, t}$'s distinct
+\end{tabular}
+\end{center}
+
+\pause \item 
+\begin{center}
+\begin{tabular}{l|p{4cm}}
+Final posterior probability & if... \\ \hline
+1 & $\wh{\mu}_{f, 1} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 2}$ or $\wh{\mu}_{f, 2} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 1}$ \\
+$P(M_3 \mid \text{data}) + P(M_5 \mid \text{data})$ & otherwise
+\end{tabular}
+\end{center}
+
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{{\tt ShrinkBayes}}
+\begin{itemize}
+\item Built on {\tt inla} (integrated nested Laplace approximation).
+\pause \item empirical Bayes with a zero-inflated NB likelihood and normal priors.
+\pause \item I reparameterize
+
+\begin{align*}
+\phi_f &= \frac{\mu_{f, 1} + \mu_{f, 2}}{2} \qquad \text{(parental mean)} \\
+\alpha_f &= \frac{\mu_{f, 2} - \mu_{f, 1}}{2} \qquad \text{(half parental difference)} \\
+\delta_f &= \mu_{f, 3} - \frac{\mu_{f, 1} + \mu_{f, 2}}{2} \qquad \text{(hybrid effect)} 
+\end{align*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{{\tt ShrinkBayes}}
+
+
+\tiny
+\begin{tabular}{c|c|c}
+$\phi_f$ & $\alpha_f$ & $\delta_f$ \\ \hline
+parental mean & half parental difference & hybrid effect
+\end{tabular}
+
+\normalsize
+
+\begin{itemize}
+\item 
+\end{itemize}
+
+
+\end{frame}
 
 \end{document}
