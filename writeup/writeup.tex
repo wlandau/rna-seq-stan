@@ -52,7 +52,7 @@
 
 \section{The Simulation Study}
 
-\paragraph{} We compare our method to existing ones in a simulation study. We generate thirty datasets using simulation parameters calculated from real data and analyze the pseudo-data using our method and the popular R language packages {\tt edgeR}, {\tt baySeq}, and {\tt ShrinkBayes}. Using ROC (receiver operating characteristic) curves, we rank the methods' abilities to identify heterosis genes.
+\paragraph{} We compare our method to existing ones in a simulation study. We generate thirty datasets using simulation parameters calculated from real data and analyze the pseudo-data using our method and the popular R language packages {\tt edgeR}, {\tt baySeq}, and {\tt ShrinkBayes} \cite{cran} \cite{bioconductor}. Using ROC (receiver operating characteristic) curves, we rank the methods' abilities to identify heterosis genes.
 
 \section{Simulated Data}
 
@@ -64,7 +64,7 @@
 
 \section{{\tt edgeR}}
 
-\paragraph{} {\tt edgeR} is one of the most popular R packages in RNA-sequencing data analysis. Its newest implementation applies a negative binomial loglinear model to the data. It uses a Cox-Reid adjusted profile likelihood to estimate dispersion parameters, and in the case of {\tt estimateGLMTagwiseDisp()}, shrinks the final dispersion estimates towards those of neighboring features on a common trend. It then estimates main effects using a Fisher scoring algorithm.
+\paragraph{} {\tt edgeR} is one of the most popular R packages in RNA-sequencing data analysis. Its newest implementation applies a negative binomial loglinear model to the data. It uses a Cox-Reid adjusted profile likelihood to estimate dispersion parameters, and in the case of {\tt estimateGLMTagwiseDisp()}, shrinks the final dispersion estimates towards those of neighboring features on a common trend. It then estimates main effects using a Fisher scoring algorithm \cite{edgeR1} \cite{edgeR2}.
 
 \paragraph{} Using the {\tt calcNormFactors()}, {\tt estimateGLMTagwiseDisp()}, and {\tt glmFit()} functions in the {\tt edgeR} package, we calculate normalization factor estimates $\wh{c}_i$ for $i = 1, \ldots, 3N$, dispersion parameter estimates $\wh{\psi}_{f}$ for feature $f = 1, \ldots, 25000$, and main effects $\wh{\mu}_{f, t}$ for each $f$ and treatment group $t = 1$ (parent 1), 2 (parent 2), 3 (hybrid). Using the {\tt glmLRT()} function, we use likelihood ratio tests to perform the following hypothesis tests.
 
@@ -85,7 +85,7 @@ p_{f, 2}/2 & \wh{\mu}_{f, 3} < \wh{\mu}_{f, 2} \le \wh{\mu}_{f, 1} \text{ or } \
 
 \section{{\tt ShrinkBayes}}
 
-\paragraph{} {\tt ShrinkBayes} is based on the {\tt inla} package, which applies an integrated nested Laplace approximation to fit models in empirical Bayes fashion. {\tt ShrinkBayes} applies a zero-inflated negative binomial model with normal distributions as priors. In our usage, we make the following reparameterization
+\paragraph{} {\tt ShrinkBayes} is based on the {\tt inla} package, which applies an integrated nested Laplace approximation to fit models in empirical Bayes fashion. {\tt ShrinkBayes} applies a zero-inflated negative binomial model with normal distributions as priors \cite{ShrinkBayes}. In our usage, we make the following reparameterization
 
 \begin{align*}
 \phi_f &= \frac{\mu_{f, 1} + \mu_{f, 2}}{2} \qquad \text{(parental mean)} \\
@@ -108,7 +108,7 @@ P(\delta_f + \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < - \wh{\alpha}_f \\
 
 \section{{\tt baySeq}}
 
-\paragraph{} {\tt baySeq} uses an empirical Bayes procedure to calculate the posterior probabilities that each feature follows each of the multiple models supplied by the user. In the {\tt baySeq} framework, a user-supplied model is an an assignment of libraries to treatment groups. In the case of heterosis experiments, it is appropriate to consider the following five models.
+\paragraph{} {\tt baySeq} uses an empirical Bayes procedure to calculate the posterior probabilities that each feature follows each of the multiple models supplied by the user \cite{baySeq}. In the {\tt baySeq} framework, a user-supplied model is an an assignment of libraries to treatment groups. In the case of heterosis experiments, it is appropriate to consider the following five models.
 
 \begin{align*}
 M_1&: \mu_{f, 1} = \mu_{f, 2} = \mu_{f, 3} \\
@@ -131,7 +131,10 @@ We calculate estimates $\wh{\mu}_{f, t}$ for $f = 1, \ldots, 25000$ and $t = 1, 
 
 \section{ROC curves}
 
-\paragraph{} We use receiver operating characteristic (ROC) curves to compare the effectiveness of our method versus {\tt edgeR}, {\tt ShrinkBayes}, and {\tt baySeq}. A ROC curve is a tool for measuring the effectiveness of a binary classifier. It is a graph of the true positive rate (TPR) of detection against the false positive rate (FPR), so a high area under the curve (AUC) is favorable. Landau and Liu describe most of the details of calculation. However, note that in this study, posterior probabilities sometimes replace p-values, and we test for heterosis, not differential expression.
+\paragraph{} We use receiver operating characteristic (ROC) curves to compare the effectiveness of our method versus {\tt edgeR}, {\tt ShrinkBayes}, and {\tt baySeq}. A ROC curve is a tool for measuring the effectiveness of a binary classifier. It is a graph of the true positive rate (TPR) of detection against the false positive rate (FPR), so a high area under the curve (AUC) is favorable. Landau and Liu \cite{LandauLiu} describe most of the details of calculation. However, note that in this study, posterior probabilities sometimes replace p-values, and we test for heterosis, not differential expression.
 
 \end{flushleft}
+
+\bibliography{writeup}
+\bibliographystyle{plain}
 \end{document}

@@ -6,7 +6,8 @@ source("setup.R")
 #for(sample.size in sample.sizes)
 #  simulator(sample.size = sample.size)
 
-pvals(which.datasets, ncpus, sample.sizes)
+#unpack.stan()
+#pvals(which.datasets, ncpus, sample.sizes)
 #rocs(which.datasets, sample.sizes)
 #aucs(which.datasets, sample.sizes)
 
