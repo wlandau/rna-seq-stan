@@ -143,7 +143,7 @@
 \end{align*}
 
 \pause \begin{align*}
-y_{f, i} &\mathop{\sim}^{\text{iid}} NB\left (\exp \left ( c_{\lceil 4i/N \rceil} + \mu_{f, \lceil i/N \rceil} \right ), \ \phi_f  \right )
+y_{f, i} &\mathop{\sim}^{\text{iid}} NB\left (\exp \left ( c_{\lceil 4i/N \rceil} + \mu_{f, \lceil i/N \rceil} \right ), \ \psi_f  \right )
 \end{align*}
 
 \begin{itemize}
@@ -267,11 +267,11 @@ parental mean & half parental difference & hybrid effect
 \begin{center}
 \begin{tabular}{l|l}
 Posterior probability & if... \\ \hline
-0 & $|\delta_f| < |\alpha_f|$, otherwise: \\
-$P(\delta_f + \alpha_f > 0 \mid \text{data})$ & $\delta_f > -\alpha_f$ \\
-$P(\delta_f - \alpha_f > 0 \mid \text{data})$ & $\delta_f > \alpha_f$ \\
-$P(\delta_f - \alpha_f < 0 \mid \text{data})$ & $\delta_f < \alpha_f$ \\
-$P(\delta_f + \alpha_f < 0 \mid \text{data})$ & $\delta_f < -\alpha_f$ \\
+0 & $|\wh{\delta}_f| < |\wh{\alpha}_f|$, otherwise: \\
+$P(\delta_f + \alpha_f > 0 \mid \text{data})$ & $\wh{\delta}_f > -\wh{\alpha}_f$ \\
+$P(\delta_f - \alpha_f > 0 \mid \text{data})$ & $\wh{\delta}_f > \wh{\alpha}_f$ \\
+$P(\delta_f - \alpha_f < 0 \mid \text{data})$ & $\wh{\delta}_f < \wh{\alpha}_f$ \\
+$P(\delta_f + \alpha_f < 0 \mid \text{data})$ & $\wh{\delta}_f < -\wh{\alpha}_f$ \\
 \end{tabular}
 \end{center}
 
