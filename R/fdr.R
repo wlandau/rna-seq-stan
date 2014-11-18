@@ -37,10 +37,11 @@ fdr = function(pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan"), sample.sizes 
   for(pkg in pkgs)
     for(sample.size in sample.sizes)
       for(rep in reps){
+        print(paste(pkg, sample.size, rep))
         dan = rbind(dan, readRDS(paste("../fdr/dan-", pkg, rep, "-", sample.size, ".rds", sep="")))
         jarad = rbind(jarad, readRDS(paste("../fdr/jarad-", pkg, rep, "-", sample.size, ".rds", sep="")))
       }
 
-  saveRDS(as.data.frame(dan), "../fdr/jarad.rds")
+  saveRDS(as.data.frame(dan), "../fdr/dan.rds")
   saveRDS(as.data.frame(jarad), "../fdr/jarad.rds")
 }
