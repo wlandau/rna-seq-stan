@@ -1,5 +1,5 @@
-\documentclass{beamer}
-%\documentclass[handout]{beamer}
+%\documentclass{beamer}
+\documentclass[handout]{beamer}
 \usetheme{Marburg}
 \useoutertheme{infolines}
 \newcommand{\answers}{1}
@@ -136,22 +136,31 @@
 
 
 \begin{frame}
-\frametitle{A single simulation (of 30)}
-\definecolor{darkgreen}{rgb}{0, .7, 0}
+\frametitle{Generating the data}
+\definecolor{darkgreen}{rgb}{0, .6, 0}
+
+\begin{itemize}
+\item Does feature $f$ truly have heterosis?
 \begin{align*}
-\text{truth}_f &= I({\color{darkgreen}\mu_{f, 3}} > \max({\color{red}\mu_{f, 1}}, {\color{blue}\mu_{f, 2}}) \text{ or } {\color{darkgreen}\mu_{f, 3}} < \min({\color{red}\mu_{f, 1}}, {\color{blue}\mu_{f, 2}})) \\
+\text{truth}_f = I(&{\color{darkgreen}\mu_{f, 3}} > \max({\color{red}\mu_{f, 1}}, {\color{blue}\mu_{f, 2}}) \text{ or } \\ &{\color{darkgreen}\mu_{f, 3}} < \min({\color{red}\mu_{f, 1}}, {\color{blue}\mu_{f, 2}}))
 \end{align*}
 
-\pause \begin{align*}
-y_{f, i} &\mathop{\sim}^{\text{iid}} NB\left (\exp \left ( c_{\lceil 4i/N \rceil} + \mu_{f, \lceil i/N \rceil} \right ), \ \psi_f  \right )
+\pause 
+
+\item For a dataset with 4 libraries per group,
+
+
+\begin{align*}
+y_{f, i} &\mathop{\sim}^{\text{iid}} NB\left (\exp \left ( c_{i} + \mu_{f, t(i)} \right ), \ \psi_f  \right )
 \end{align*}
 
 \begin{itemize}
-\item where:
-\begin{itemize}
-\item Sample (library, column) $i = 1, \ldots, 3N$ 
-\item $N$ = samples per treatment group (4, 8, or 16)
+\item $t(i)$ is the group of library $i$.
+\pause \item Resimulate to increase the number of libraries per group.
 \end{itemize}
+
+
+
 \pause \item Remove extremely low-count features.
 \pause \item Take a random subset of 25000 features from the remaining ones.
 \end{itemize}
