@@ -13,6 +13,7 @@
 .Rapp.history
 .Rhistory
 auc/
+fdr/
 pvals/
 local/
 log/
