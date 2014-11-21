@@ -1,5 +1,5 @@
 prepFDRdf = function(fdr, upper = 0.15, npts = 100, pkg, sample.size, rep){
-  apx = approx(x = fdr$cutoff, fdr$FDR, xout = (0:npts/npts)*0.15)
+  apx = approx(x = fdr$cutoff, fdr$FDR, xout = (1:npts/npts)*0.15)
   apxfdr = data.frame(cutoff = apx$x, FDR = apx$y)
 
   apxfdr$FDRminusCutoff = apxfdr$FDR - apxfdr$cutoff

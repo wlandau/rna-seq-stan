@@ -123,6 +123,26 @@ plotAUC = function(file = "../auc/auc.rds", jitter = T){
     ggsave(paste("../fig/auc", jitter, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
 }
 
+plotFDR = function(type = "dan", facet.direction = T){
+  d = readRDS(paste("../fdr/", type, ".rds", sep=""))
+  for(i in 1:dim(d)[2])
+    d[[i]][is.na(d[[i]])] = 0
+ 
+
+  pl = ggplot(d, aes(x = cutoff, y = FDRminusCutoff)) + 
+         geom_abline(slope = 0, intercept = 0, color = "blue") + 
+         geom_line(aes(group = rep)) + 
+         xlab("\nCutoff (p-value or posterior probability)") + 
+         ylab("FDR - cutoff\n") + 
+         facet_grid(pkg ~ sample.size)
+
+  if(facet.direction)
+    pl = pl + facet_grid(pkg ~ sample.size)
+  else
+    pl = pl + facet_grid(sample.size ~ pkg)
+
+   ggsave(paste("../fig/fdr-", type, "-", facet.direction, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+}
 
 makePlots = function(){
   plotExampleROC(1e-1)
@@ -131,4 +151,8 @@ makePlots = function(){
   plotAUC(jitter = T) 
   plotAUCfacet(facet.by = "SampleSize")
   plotAUCfacet(facet.by = "Method")
+  plotFDR("dan", T)
+  plotFDR("dan", F)
+  plotFDR("jarad", T)
+  plotFDR("jarad", F)
 }
