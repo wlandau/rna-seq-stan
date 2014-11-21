@@ -128,7 +128,7 @@ plotFDR = function(type = "dan", facet.direction = T){
   for(i in 1:dim(d)[2])
     d[[i]][is.na(d[[i]])] = 0
  
-  d$sample.size = revalue(d$sample.size, c("4" = "4 samples per group", "8" = "8 samples per group", "16" = "16 samples per group"))
+  d$sample.size = revalue(as.factor(d$sample.size), c("4" = "4 samples / group", "8" = "8 samples / group", "16" = "16 samples / group"))
 
   pl = ggplot(d, aes(x = cutoff, y = FDRminusCutoff)) + 
          geom_abline(slope = 0, intercept = 0, color = "blue") + 
