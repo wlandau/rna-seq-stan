@@ -1,4 +1,6 @@
 *.aux
+*.bbl
+*.blg
 *.log
 *.nav
 *.out
@@ -11,6 +13,8 @@
 .Rapp.history
 .Rhistory
 auc/
+fdr/
+pvals/
 local/
 log/
 roc/

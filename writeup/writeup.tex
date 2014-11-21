@@ -1,0 +1,140 @@
+\documentclass{article}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{caption}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{latexsym}
+\usepackage{listings}
+\usepackage{mathrsfs}
+\usepackage[nottoc]{tocbibind}
+\usepackage{setspace}
+\usepackage{tikz}
+\usepackage{tkz-graph}
+\usepackage{url}
+
+\providecommand{\all}{\ \forall \ }
+\providecommand{\bs}{\backslash}
+\providecommand{\e}{\varepsilon}
+\providecommand{\E}{\ \exists \ }
+\providecommand{\lm}[2]{\lim_{#1 \rightarrow #2}}
+\providecommand{\m}[1]{\mathbb{#1}}
+\providecommand{\mc}[1]{\mathcal{#1}}
+\providecommand{\nv}{{}^{-1}}
+\providecommand{\ov}[1]{\overline{#1}}
+\providecommand{\p}{\newpage}
+\providecommand{\q}{$\quad$ \newline}
+\providecommand{\rt}{\rightarrow}
+\providecommand{\Rt}{\Rightarrow}
+\providecommand{\vc}[1]{\boldsymbol{#1}}
+\providecommand{\wh}[1]{\widehat{#1}}
+
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+\pagenumbering{gobble}
+
+\begin{document}
+\begin{flushleft}
+
+
+\section{The Simulation Study}
+
+\paragraph{} We compare our method to existing ones in a simulation study. We generate thirty datasets using simulation parameters calculated from real data and analyze the pseudo-data using our method and the popular R language packages {\tt edgeR}, {\tt baySeq}, and {\tt ShrinkBayes} \cite{cran} \cite{bioconductor}. Using ROC (receiver operating characteristic) curves, we rank the methods' abilities to identify heterosis genes.
+
+\section{Simulated Data}
+
+\paragraph{} We begin with a real heterosis RNA-seq dataset from a study by Paschold, Jia, Marcon, and others \cite{paschold}. We select four libraries from each parent genotype and from the hybrid genotype, totaling twelve libraries for analysis. After library selection, we trim low-count features (genes): that is, we remove all the features with mean expression level below $\exp(1)$ or with more than three zero counts, leaving 27888 features. Using the {\tt calcNormFactors()}, {\tt estimateGLMTagwiseDisp()}, and {\tt glmFit()} functions in the {\tt edgeR} package, we calculate normalization factors $c_1, \ldots, c_{12}$, dispersion parameters $\psi_{f}$ for feature $f = 1, \ldots, 27888$, and main effects $\mu_{f, t}$ for each $f$ and treatment group $t = 1$ (parent 1), 2 (parent 2), 3 (hybrid). These estimates serve as simulation parameters for all of our thirty pseudo-datasets.
+
+\paragraph{} To simulate a dataset with $N$ libraries per treatment group ($3N$ total libraries), the count for feature $f$ and library $i$ is drawn from a NB($\exp(c_{\lceil 4i/N \rceil} + \mu_{f, \lceil i/N \rceil}), \ \psi_f$) distribution independently of the other counts. Note that feature $f$ is a heterosis feature if $\mu_{f, 3} > \max(\mu_{f, 1}, \mu_{f, 2})$ or if $\mu_{f, 3} < \min(\mu_{f, 1}, \mu_{f, 2})$. Lastly, we apply the same trimming procedure as before and select a random subset of 25000 of the remaining features. For that dataset, we maintain a ``truth vector" $H = (h_1, \ldots, h_{25000})$, where $h_f = 1$ if feature $f$ of the simulated dataset is a heterosis feature and $h_f = 0$ otherwise.
+
+\paragraph{} We simulate 30 datasets total: 10 with $N = 4$, 10 with $N = 8$, and 10 with $N = 16$.
+
+\section{{\tt edgeR}}
+
+\paragraph{} {\tt edgeR} is one of the most popular R packages in RNA-sequencing data analysis. Its newest implementation applies a negative binomial loglinear model to the data. It uses a Cox-Reid adjusted profile likelihood to estimate dispersion parameters, and in the case of {\tt estimateGLMTagwiseDisp()}, shrinks the final dispersion estimates towards those of neighboring features on a common trend. It then estimates main effects using a Fisher scoring algorithm \cite{edgeR1} \cite{edgeR2}.
+
+\paragraph{} Using the {\tt calcNormFactors()}, {\tt estimateGLMTagwiseDisp()}, and {\tt glmFit()} functions in the {\tt edgeR} package, we calculate normalization factor estimates $\wh{c}_i$ for $i = 1, \ldots, 3N$, dispersion parameter estimates $\wh{\psi}_{f}$ for feature $f = 1, \ldots, 25000$, and main effects $\wh{\mu}_{f, t}$ for each $f$ and treatment group $t = 1$ (parent 1), 2 (parent 2), 3 (hybrid). Using the {\tt glmLRT()} function, we use likelihood ratio tests to perform the following hypothesis tests.
+
+\begin{align*}
+&H_{0, f, 1} : \mu_{f, 3} - \mu_{f, 1} = 0 \text{ vs } H_{a, f, 1}: \mu_{f, 3} - \mu_{f, 1} \ne 0 \\
+&H_{0, f, 2} : \mu_{f, 3} - \mu_{f, 2} = 0 \text{ vs } H_{a, f, 1}: \mu_{f, 3} - \mu_{f, 2} \ne 0
+\end{align*}
+
+We obtain p-values $p_{f, 1}$ and $p_{f, 2}$, respectively, from each of the above tests. To translate the results into a test for heterosis for each feature, we compute the following p-values
+
+\begin{align*}
+p_{f, {\tt edgeR}} = \begin{cases}
+p_{f, 1}/2 & \wh{\mu}_{f, 3} < \wh{\mu}_{f, 1} \le \wh{\mu}_{f, 2} \text{ or } \wh{\mu}_{f, 3} > \wh{\mu}_{f, 1} \ge \wh{\mu}_{f, 2} \\
+p_{f, 2}/2 & \wh{\mu}_{f, 3} < \wh{\mu}_{f, 2} \le \wh{\mu}_{f, 1} \text{ or } \wh{\mu}_{f, 3} > \wh{\mu}_{f, 2} \ge \wh{\mu}_{f, 1} \\
+1 & \wh{\mu}_{f, 1} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 2} \text{ or } \wh{\mu}_{f, 2} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 1}
+\end{cases}
+\end{align*}
+
+\section{{\tt ShrinkBayes}}
+
+\paragraph{} {\tt ShrinkBayes} is based on the {\tt inla} package, which applies an integrated nested Laplace approximation to fit models in empirical Bayes fashion. {\tt ShrinkBayes} applies a zero-inflated negative binomial model with normal distributions as priors \cite{ShrinkBayes}. In our usage, we make the following reparameterization
+
+\begin{align*}
+\phi_f &= \frac{\mu_{f, 1} + \mu_{f, 2}}{2} \qquad \text{(parental mean)} \\
+\alpha_f &= \frac{\mu_{f, 2} - \mu_{f, 1}}{2} \qquad \text{(half parental difference)} \\
+\delta_f &= \mu_{f, 3} - \frac{\mu_{f, 1} + \mu_{f, 2}}{2} \qquad \text{(hybrid effect)} 
+\end{align*}
+
+We use the {\tt ShrinkSeq()} and {\tt FitAllShrink()} functions to fit the model and use {\tt inla.make.lincombs()}, {\tt BFUpdatePosterior()}, and {\tt SummaryWrap()} to calculate posterior probabilities $P(\delta_f + \alpha_f > 0 \ | \ \text{data})$, $P(\delta_f - \alpha_f > 0 \ | \ \text{data})$, $P(\delta_f - \alpha_f < 0 \ | \ \text{data})$, and $P(\delta_f + \alpha_f < 0 \ | \ \text{data})$, along with estimates of $\phi_f$, $\alpha_f$, and $\delta_f$ for $f = 1, \ldots, 25000$. Using this information, we calculate the posterior probability that each feature $f$ is not a heterosis feature,
+
+
+\begin{align*}
+p_{f, {\tt ShrinkBayes}} = \begin{cases}
+1 & |\wh{\delta}_f| < |\wh{\alpha}_f|. \text{ Otherwise,} \\
+P(\delta_f + \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > - \wh{\alpha}_f \\ 
+P(\delta_f - \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > \wh{\alpha}_f \\ 
+P(\delta_f - \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < \wh{\alpha}_f \\ 
+P(\delta_f + \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < - \wh{\alpha}_f \\ 
+\end{cases}
+\end{align*}
+
+\section{{\tt baySeq}}
+
+\paragraph{} {\tt baySeq} uses an empirical Bayes procedure to calculate the posterior probabilities that each feature follows each of the multiple models supplied by the user \cite{baySeq}. In the {\tt baySeq} framework, a user-supplied model is an an assignment of libraries to treatment groups. In the case of heterosis experiments, it is appropriate to consider the following five models.
+
+\begin{align*}
+M_1&: \mu_{f, 1} = \mu_{f, 2} = \mu_{f, 3} \\
+M_2&: \mu_{f, 1} = \mu_{f, 2} \\
+M_3&: \mu_{f, 1} = \mu_{f, 3} \\
+M_4&: \mu_{f, 2} = \mu_{f, 3} \\
+M_5&: \text{All } \mu_{f, t}\text{'s are distinct.} \\
+\end{align*}
+
+Now, let $p_{f, {\tt baySeq}}$ be the posterior probability that feature $f$ of a given simulated dataset is not a heterosis feature. We can calculate
+
+\begin{align*}
+p_{f, {\tt baySeq}} = \begin{cases}
+1 & \wh{\mu}_{f, 1} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 2} \text{ or } \wh{\mu}_{f, 2} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 1} \\
+P(M_1 | \text{data}) + P(M_3 | \text{data}) + P(M_4 | \text{data}) & \text{otherwise}
+\end{cases}
+\end{align*}
+
+We calculate estimates $\wh{\mu}_{f, t}$ for $f = 1, \ldots, 25000$ and $t = 1, 2, 3$ using {\tt edgeR} as described previously.
+
+\section{ROC curves}
+
+\paragraph{} We use receiver operating characteristic (ROC) curves to compare the effectiveness of our method versus {\tt edgeR}, {\tt ShrinkBayes}, and {\tt baySeq}. A ROC curve is a tool for measuring the effectiveness of a binary classifier. It is a graph of the true positive rate (TPR) of detection against the false positive rate (FPR), so a high area under the curve (AUC) is favorable. Landau and Liu \cite{LandauLiu} describe most of the details of calculation. However, note that in this study, posterior probabilities sometimes replace p-values, and we test for heterosis, not differential expression.
+
+\end{flushleft}
+
+\bibliography{writeup}
+\bibliographystyle{plain}
+\end{document}

@@ -1,5 +1,5 @@
-\documentclass{beamer}
-%\documentclass[handout]{beamer}
+%\documentclass{beamer}
+\documentclass[handout]{beamer}
 \usetheme{Marburg}
 \useoutertheme{infolines}
 \newcommand{\answers}{1}
@@ -136,22 +136,30 @@
 
 
 \begin{frame}
-\frametitle{A single simulation (of 30)}
-\definecolor{darkgreen}{rgb}{0, .7, 0}
+\frametitle{Generating the data}
+
+\begin{itemize}
+\item Does feature $f$ truly have heterosis?
 \begin{align*}
-\text{truth}_f &= I({\color{darkgreen}\mu_{f, 3}} > \max({\color{red}\mu_{f, 1}}, {\color{blue}\mu_{f, 2}}) \text{ or } {\color{darkgreen}\mu_{f, 3}} < \min({\color{red}\mu_{f, 1}}, {\color{blue}\mu_{f, 2}})) \\
+\text{truth}_f = I(&{\color{dkgreen}\mu_{f, 3}} > \max({\color{red}\mu_{f, 1}}, {\color{blue}\mu_{f, 2}}) \text{ or } \\ &{\color{dkgreen}\mu_{f, 3}} < \min({\color{red}\mu_{f, 1}}, {\color{blue}\mu_{f, 2}}))
 \end{align*}
 
-\pause \begin{align*}
-y_{f, i} &\mathop{\sim}^{\text{iid}} NB\left (\exp \left ( c_{\lceil 4i/N \rceil} + \mu_{f, \lceil i/N \rceil} \right ), \ \phi_f  \right )
+\pause 
+
+\item For a dataset with 4 libraries per group,
+
+
+\begin{align*}
+y_{f, i} &\mathop{\sim}^{\text{iid}} NB\left (\exp \left ( c_{i} + \mu_{f, t(i)} \right ), \ \psi_f  \right )
 \end{align*}
 
 \begin{itemize}
-\item where:
-\begin{itemize}
-\item Sample (library, column) $i = 1, \ldots, 3N$ 
-\item $N$ = samples per treatment group (4, 8, or 16)
+\item $t(i)$ is the group of library $i$.
+\pause \item Resimulate to increase the number of libraries per group.
 \end{itemize}
+
+
+
 \pause \item Remove extremely low-count features.
 \pause \item Take a random subset of 25000 features from the remaining ones.
 \end{itemize}
@@ -175,27 +183,70 @@ y_{f, i} &\mathop{\sim}^{\text{iid}} NB\left (\exp \left ( c_{\lceil 4i/N \rceil
 \item Fit a loglinear model to estimate main effects $\mu_{f, t}$
 \begin{itemize}
 \item Feature $f = 1, \ldots, 25000$
-\item Treatment group $t = $ 1 (parent), 2 (parent), 3 (hybrid)
+\item Treatment group $t = $ {\color{red} 1 (parent)}, {\color{blue} 2 (parent)}, {\color{dkgreen} 3 (hybrid)}
 \end{itemize}
-\pause \item Likelihood ratio tests to get p-values $p_{f, 1}, \ p_{f, 2}$
+\pause \item Likelihood ratio tests to get p-values ${\color{red} p_{f, 1}}, \ {\color{blue} p_{f, 2}}$
 
 \begin{align*}
-H_{0, 1}: \mu_{f, 3} &= \mu_{f, 1} \qquad H_{a, 1}: \mu_{f, 3} \ne \mu_{f, 1} \\
-H_{0, 2}: \mu_{f, 3} &= \mu_{f, 2} \qquad H_{a, 2}: \mu_{f, 3} \ne \mu_{f, 2}
+H_{0, 1}:{\color{dkgreen} \mu_{f, 3}} &= {\color{red}\mu_{f, 1}} \qquad H_{a, 1}: {\color{dkgreen}\mu_{f, 3}} \ne {\color{red} \mu_{f, 1}} \\
+H_{0, 2}: {\color{dkgreen} \mu_{f, 3}} &= {\color{blue} \mu_{f, 2}} \qquad H_{a, 2}: {\color{dkgreen}\mu_{f, 3}} \ne {\color{blue}\mu_{f, 2}}
 \end{align*}
 
 
-\pause \item 
-\begin{center}
-\begin{tabular}{l|c}
-Final p-value & if... \\ \hline
-$p_{f, 1}/2$ & $\wh{\mu}_{f, 3} < \wh{\mu}_{f, 1} \le \wh{\mu}_{f, 2}$ or $\wh{\mu}_{f, 3} > \wh{\mu}_{f, 1} \ge \wh{\mu}_{f, 2}$ \\
-$p_{f, 2}/2$ & $\wh{\mu}_{f, 3} < \wh{\mu}_{f, 2} \le \wh{\mu}_{f, 1}$ or $\wh{\mu}_{f, 3} > \wh{\mu}_{f, 2} \ge \wh{\mu}_{f, 1}$ \\
-1 & $\wh{\mu}_{f, 1} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 2}$ or $\wh{\mu}_{f, 2} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 1}$
-\end{tabular}
-\end{center}
+\pause \item Final p-value:
 
 \end{itemize}
+
+
+\begin{align*}
+p_{f, \text{{\tt edgeR}}} &= \begin{cases}
+{\color{red}p_{f, 1}}/{2} &{\color{dkgreen} \wh{\mu}_{f, 3} }< {\color{red}\wh{\mu}_{f, 1}} \le {\color{blue}\wh{\mu}_{f, 2}} \text{ or }{\color{dkgreen}\wh{\mu}_{f, 3}} > {\color{red}\wh{\mu}_{f, 1}} \ge {\color{blue}\wh{\mu}_{f, 2}} \\
+{\color{blue}p_{f, 2}}/{2} &{\color{dkgreen} \wh{\mu}_{f, 3}} < {\color{blue}\wh{\mu}_{f, 2}} \le {\color{red}\wh{\mu}_{f, 1}} \text{ or }{\color{dkgreen}\wh{\mu}_{f, 3}} > {\color{blue}\wh{\mu}_{f, 2}} \ge {\color{red}\wh{\mu}_{f, 1}} \\
+1 & {\color{red}\wh{\mu}_{f, 1}} \le {\color{dkgreen} \wh{\mu}_{f, 3}} \le {\color{blue}\wh{\mu}_{f, 2}} \text{ or } {\color{blue}\wh{\mu}_{f, 2}} \le{\color{dkgreen} \wh{\mu}_{f, 3}} \le {\color{red}\wh{\mu}_{f, 1}}
+\end{cases}
+\end{align*}
+\end{frame}
+
+\subsection{{\tt ShrinkBayes}}
+
+\begin{frame}
+\frametitle{{\tt ShrinkBayes}}
+\begin{itemize}
+\item Built on {\tt inla} (integrated nested Laplace approximation).
+\pause \item empirical Bayes with a zero-inflated NB likelihood and normal priors.
+\pause \item I reparameterize
+
+\begin{align*}
+\phi_f &= \frac{{\color{red}\mu_{f, 1}} + {\color{blue}\mu_{f, 2}}}{2} \qquad \text{(parental mean)} \\
+\alpha_f &= \frac{{\color{blue}\mu_{f, 2}} - {\color{red}\mu_{f, 1}}}{2} \qquad \text{(half parental difference)} \\
+\delta_f &= {\color{dkgreen}\mu_{f, 3}} - \frac{{\color{red}\mu_{f, 1}} + {\color{blue}\mu_{f, 2}}}{2} \qquad \text{(hybrid effect)} 
+\end{align*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{{\tt ShrinkBayes}}
+
+\begin{align*}
+\alpha_f &= \text{ half parental difference} \\
+\delta_f &= \text{ hybrid effect}
+\end{align*}
+
+\begin{itemize}
+\item Use contrasts to calculate final posterior probabilities of heterosis:
+
+\end{itemize}
+
+
+\begin{align*}
+p_{f, \text{\tt ShrinkBayes}} &= \begin{cases}
+0 & \left |\wh{\delta}_f  \right | < \left | \wh{\alpha}_f  \right | \text{, o.w.:} \\
+P(\delta_f + \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > -\wh{\alpha}_f \\
+P(\delta_f - \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > \wh{\alpha}_f \\
+P(\delta_f - \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < \wh{\alpha}_f \\
+P(\delta_f + \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < -\wh{\alpha}_f
+\end{cases}
+\end{align*}
 \end{frame}
 
 
@@ -211,71 +262,25 @@ $p_{f, 2}/2$ & $\wh{\mu}_{f, 3} < \wh{\mu}_{f, 2} \le \wh{\mu}_{f, 1}$ or $\wh{\
 \begin{tabular}{l|l}
 Model & Constraint \\ \hline
 $M_1$ & All $\mu_{f, t}$'s equal \\
-$M_2$ &  $\mu_{f, 1} = \mu_{f, 2}$ \\
-$M_3$ & $\mu_{f, 1} = \mu_{f, 3}$ \\
-$M_4$ & $\mu_{f, 2} = \mu_{f, 3}$ \\
+$M_2$ &  ${\color{red}\mu_{f, 1}} = {\color{blue}\mu_{f, 2}}$ \\
+$M_3$ & ${\color{red}\mu_{f, 1}} = {\color{dkgreen}\mu_{f, 3}}$ \\
+$M_4$ & ${\color{blue}\mu_{f, 2}} = {\color{dkgreen}\mu_{f, 3}}$ \\
 $M_5$ &  All $\mu_{f, t}$'s distinct
 \end{tabular}
 \end{center}
 
 \pause \item Final posterior probabilities of heterosis:
-\begin{center}
-\begin{tabular}{l|p{4cm}}
-Posterior probability & if... \\ \hline
-0 & $\wh{\mu}_{f, 1} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 2}$ or $\wh{\mu}_{f, 2} \le \wh{\mu}_{f, 3} \le \wh{\mu}_{f, 1}$ \\
-$P(M_3 \mid \text{data}) + P(M_5 \mid \text{data})$ & otherwise
-\end{tabular}
-\end{center}
 
 \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{{\tt ShrinkBayes}}
-\begin{itemize}
-\item Built on {\tt inla} (integrated nested Laplace approximation).
-\pause \item empirical Bayes with a zero-inflated NB likelihood and normal priors.
-\pause \item I reparameterize
 
 \begin{align*}
-\phi_f &= \frac{\mu_{f, 1} + \mu_{f, 2}}{2} \qquad \text{(parental mean)} \\
-\alpha_f &= \frac{\mu_{f, 2} - \mu_{f, 1}}{2} \qquad \text{(half parental difference)} \\
-\delta_f &= \mu_{f, 3} - \frac{\mu_{f, 1} + \mu_{f, 2}}{2} \qquad \text{(hybrid effect)} 
+p_{f, \text{{\tt baySeq}}} &= \begin{cases}
+0 & {\color{red}\wh{\mu}_{f, 1}} \le {\color{dkgreen}\wh{\mu}_{f, 3}} \le {\color{blue}\wh{\mu}_{f, 2}}$ or $ \\
+& {\color{blue}\wh{\mu}_{f, 2}} \le {\color{dkgreen}\wh{\mu}_{f, 3}} \le {\color{red}\wh{\mu}_{f, 1}} \\
+P(M_2 \mid \text{data}) \ + \\ P(M_5 \mid \text{data}) & \text{otherwise}
+\end{cases}
 \end{align*}
-\end{itemize}
-\end{frame}
 
-
-\subsection{{\tt ShrinkBayes}}
-
-\begin{frame}
-\frametitle{{\tt ShrinkBayes}}
-
-
-\begin{center}
-\begin{tabular}{c|c|c}
-$\phi_f$ & $\alpha_f$ & $\delta_f$ \\ \hline
-parental mean & half parental difference & hybrid effect
-\end{tabular}
-\end{center}
-\normalsize
-
-\begin{itemize}
-\item Use contrasts to calculate final posterior probabilities of heterosis:
-
-\begin{center}
-\begin{tabular}{l|l}
-Posterior probability & if... \\ \hline
-0 & $|\delta_f| < |\alpha_f|$, otherwise: \\
-$P(\delta_f + \alpha_f > 0 \mid \text{data})$ & $\delta_f > -\alpha_f$ \\
-$P(\delta_f - \alpha_f > 0 \mid \text{data})$ & $\delta_f > \alpha_f$ \\
-$P(\delta_f - \alpha_f < 0 \mid \text{data})$ & $\delta_f < \alpha_f$ \\
-$P(\delta_f + \alpha_f < 0 \mid \text{data})$ & $\delta_f < -\alpha_f$ \\
-\end{tabular}
-\end{center}
-
-\end{itemize}
 \end{frame}
 
 \section{The contest}
@@ -291,7 +296,7 @@ $P(\delta_f + \alpha_f < 0 \mid \text{data})$ & $\delta_f < -\alpha_f$ \\
 \end{itemize}
 
 \begin{tabular}{l|l|l|l|l|l|l|l}
-pval & 0.802 & 0.935 & 0.539 & 0.001 & $\cdots$ & 0.500 &  0.603  \\ \hline
+rank & 0.802 & 0.935 & 0.539 & 0.001 & $\cdots$ & 0.500 &  0.603  \\ \hline
 truth &  0 & 0 & 1 & 1 & $\cdots$ & 1 & 0 
 \end{tabular}
 
@@ -301,7 +306,7 @@ truth &  0 & 0 & 1 & 1 & $\cdots$ & 1 & 0
 \end{itemize}
 
 \begin{tabular}{l|l|l|l|l|l|l|l}
-pval & 0.000 & 0.001 & 0.005 & 0.006 & $\cdots$ & 0.901 & 1.000  \\ \hline
+rank & 0.000 & 0.001 & 0.005 & 0.006 & $\cdots$ & 0.901 & 1.000  \\ \hline
 truth &  1 & 1 & 0 & 1 & $\cdots$ & 0 & 0
 \end{tabular}
 \end{frame}
@@ -314,7 +319,7 @@ truth &  1 & 1 & 0 & 1 & $\cdots$ & 0 & 0
 \end{itemize}
 
 \pause \begin{tabular}{l|l|l|l|l|l|l|l}
-pval & {\color{blue} 0.000} & {\color{blue}0.001} & {\color{blue}0.005} & 0.006 & $\cdots$ & 0.901 & 1.000  \\ \hline
+rank & {\color{blue} 0.000} & {\color{blue}0.001} & {\color{blue}0.005} & 0.006 & $\cdots$ & 0.901 & 1.000  \\ \hline
 truth & {\color{blue}1} & {\color{blue}1} & {\color{blue}0} & 1 & $\cdots$ & 0 & 0
 \end{tabular}
 

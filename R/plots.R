@@ -1,4 +1,4 @@
-plotExampleROC = function(upper = 1e-1, pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan"), sample.sizes = c(4, 8, 16)){
+plotExampleROC = function(upper = 1e-1, pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan_corr", "stan"), sample.sizes = c(4, 8, 16)){
 
   df = NULL
   for(pkg in pkgs){
@@ -14,7 +14,7 @@ plotExampleROC = function(upper = 1e-1, pkgs = c("edgeR", "baySeq", "ShrinkBayes
 
   df$FPR = as.numeric(as.vector(df$FPR))
   df$TPR = as.numeric(as.vector(df$TPR))
-  df$Method = factor(df$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan"))
+  df$Method = factor(df$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan_corr", "stan"))
   df$SampleSize = factor(df$SampleSize, levels = c(4, 8, 16))
   df$SampleSize = revalue(df$SampleSize, c("4" = "4 samples per group", "8" = "8 samples per group", "16" = "16 samples per group"))
 
@@ -41,7 +41,7 @@ plotAUCfacet = function(file = "../auc/auc.rds", facet.by = "SampleSize"){
   a = readRDS(file)
 
   a$AUC = as.numeric(as.vector(a$AUC))
-  a$Method = factor(a$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan"))
+  a$Method = factor(a$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan_corr", "stan"))
   a$SampleSize = factor(a$SampleSize, levels = c(4, 8, 16))
 
   df = ddply(a, .variables = .(Method, SampleSize), .fun = function(x){
@@ -50,7 +50,8 @@ plotAUCfacet = function(file = "../auc/auc.rds", facet.by = "SampleSize"){
 
   colnames(df) = c("Method", "SampleSize", "Mean", "Lower", "Upper")
 
-  df = rbind(df[df$Method == "edgeR",], df[df$Method == "baySeq",], df[df$Method == "ShrinkBayes",], df[df$Method == "stan",])
+  df = rbind(df[df$Method == "edgeR",], df[df$Method == "baySeq",], df[df$Method == "ShrinkBayes",], 
+                  df[df$Method == "stan_corr",], df[df$Method == "stan",])
   df =  df[rep(1:dim(df)[1], each = 10),]
 
   a = cbind(a, Mean = df$Mean, Lower = df$Lower, Upper = df$Upper)
@@ -86,7 +87,7 @@ plotAUC = function(file = "../auc/auc.rds", jitter = T){
   a = readRDS(file)
 
   a$AUC = as.numeric(as.vector(a$AUC))
-  a$Method = factor(a$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan"))
+  a$Method = factor(a$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan_corr", "stan"))
   a$SampleSize = factor(a$SampleSize, levels = c(4, 8, 16))
 
   df = ddply(a, .variables = .(Method, SampleSize), .fun = function(x){
@@ -95,7 +96,8 @@ plotAUC = function(file = "../auc/auc.rds", jitter = T){
 
   colnames(df) = c("Method", "SampleSize", "Mean", "Lower", "Upper")
 
-  df = rbind(df[df$Method == "edgeR",], df[df$Method == "baySeq",], df[df$Method == "ShrinkBayes",], df[df$Method == "stan",])
+  df = rbind(df[df$Method == "edgeR",], df[df$Method == "baySeq",], df[df$Method == "ShrinkBayes",], 
+         df[df$Method == "stan_corr",], df[df$Method == "stan",])
   df =  df[rep(1:dim(df)[1], each = 10),]
 
   a = cbind(a, Mean = df$Mean, Lower = df$Lower, Upper = df$Upper)
@@ -121,6 +123,26 @@ plotAUC = function(file = "../auc/auc.rds", jitter = T){
     ggsave(paste("../fig/auc", jitter, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
 }
 
+plotFDR = function(type = "dan", facet.direction = T){
+  d = readRDS(paste("../fdr/", type, ".rds", sep=""))
+  for(i in 1:dim(d)[2])
+    d[[i]][is.na(d[[i]])] = 0
+ 
+
+  pl = ggplot(d, aes(x = cutoff, y = FDRminusCutoff)) + 
+         geom_abline(slope = 0, intercept = 0, color = "blue") + 
+         geom_line(aes(group = rep)) + 
+         xlab("\nCutoff (p-value or posterior probability)") + 
+         ylab("FDR - cutoff\n") + 
+         facet_grid(pkg ~ sample.size)
+
+  if(facet.direction)
+    pl = pl + facet_grid(pkg ~ sample.size)
+  else
+    pl = pl + facet_grid(sample.size ~ pkg)
+
+   ggsave(paste("../fig/fdr-", type, "-", facet.direction, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+}
 
 makePlots = function(){
   plotExampleROC(1e-1)
@@ -129,4 +151,8 @@ makePlots = function(){
   plotAUC(jitter = T) 
   plotAUCfacet(facet.by = "SampleSize")
   plotAUCfacet(facet.by = "Method")
+  plotFDR("dan", T)
+  plotFDR("dan", F)
+  plotFDR("jarad", T)
+  plotFDR("jarad", F)
 }
