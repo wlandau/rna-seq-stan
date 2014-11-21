@@ -11,8 +11,9 @@
 .Rapp.history
 .Rhistory
 auc/
-pvals/
 local/
 log/
 roc/
 simulations/
+.Rproj.user
+*.Rproj
