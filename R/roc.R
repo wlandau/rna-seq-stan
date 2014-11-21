@@ -15,7 +15,7 @@ roc = function(pv, truth){
   data.frame(fpr = fpr, tpr = tpr)
 }
 
-rocs = function(which.datasets = 1:10, which.sizes = c(4, 8, 16), pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan")){
+rocs = function(which.datasets = 1:10, which.sizes = c(4, 8, 16), pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan_corr", "stan")){
   for(pkg in pkgs){
     for(s in which.sizes){
       for(i in which.datasets){
@@ -36,7 +36,7 @@ auc = function(.roc, upper = 1e-1){
   sum(.roc$tpr[l] * (.roc$fpr[u] - .roc$fpr[l]))
 }
 
-aucs = function(which.datasets = 1:10, which.sizes = c(4, 8, 16), pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan")){
+aucs = function(which.datasets = 1:10, which.sizes = c(4, 8, 16), pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan_corr", "stan")){
   ret = NULL
   for(pkg in pkgs){
     for(s in which.sizes){

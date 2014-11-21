@@ -1,4 +1,4 @@
-plotExampleROC = function(upper = 1e-1, pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan"), sample.sizes = c(4, 8, 16)){
+plotExampleROC = function(upper = 1e-1, pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan_corr", "stan"), sample.sizes = c(4, 8, 16)){
 
   df = NULL
   for(pkg in pkgs){
@@ -14,7 +14,7 @@ plotExampleROC = function(upper = 1e-1, pkgs = c("edgeR", "baySeq", "ShrinkBayes
 
   df$FPR = as.numeric(as.vector(df$FPR))
   df$TPR = as.numeric(as.vector(df$TPR))
-  df$Method = factor(df$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan"))
+  df$Method = factor(df$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan_corr", "stan"))
   df$SampleSize = factor(df$SampleSize, levels = c(4, 8, 16))
   df$SampleSize = revalue(df$SampleSize, c("4" = "4 samples per group", "8" = "8 samples per group", "16" = "16 samples per group"))
 
@@ -41,7 +41,7 @@ plotAUCfacet = function(file = "../auc/auc.rds", facet.by = "SampleSize"){
   a = readRDS(file)
 
   a$AUC = as.numeric(as.vector(a$AUC))
-  a$Method = factor(a$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan"))
+  a$Method = factor(a$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan_corr", "stan"))
   a$SampleSize = factor(a$SampleSize, levels = c(4, 8, 16))
 
   df = ddply(a, .variables = .(Method, SampleSize), .fun = function(x){
@@ -50,7 +50,8 @@ plotAUCfacet = function(file = "../auc/auc.rds", facet.by = "SampleSize"){
 
   colnames(df) = c("Method", "SampleSize", "Mean", "Lower", "Upper")
 
-  df = rbind(df[df$Method == "edgeR",], df[df$Method == "baySeq",], df[df$Method == "ShrinkBayes",], df[df$Method == "stan",])
+  df = rbind(df[df$Method == "edgeR",], df[df$Method == "baySeq",], df[df$Method == "ShrinkBayes",], 
+                  df[df$Method == "stan_corr",], df[df$Method == "stan",])
   df =  df[rep(1:dim(df)[1], each = 10),]
 
   a = cbind(a, Mean = df$Mean, Lower = df$Lower, Upper = df$Upper)
@@ -86,7 +87,7 @@ plotAUC = function(file = "../auc/auc.rds", jitter = T){
   a = readRDS(file)
 
   a$AUC = as.numeric(as.vector(a$AUC))
-  a$Method = factor(a$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan"))
+  a$Method = factor(a$Method, levels = c("edgeR", "ShrinkBayes", "baySeq", "stan_corr", "stan"))
   a$SampleSize = factor(a$SampleSize, levels = c(4, 8, 16))
 
   df = ddply(a, .variables = .(Method, SampleSize), .fun = function(x){
@@ -95,7 +96,8 @@ plotAUC = function(file = "../auc/auc.rds", jitter = T){
 
   colnames(df) = c("Method", "SampleSize", "Mean", "Lower", "Upper")
 
-  df = rbind(df[df$Method == "edgeR",], df[df$Method == "baySeq",], df[df$Method == "ShrinkBayes",], df[df$Method == "stan",])
+  df = rbind(df[df$Method == "edgeR",], df[df$Method == "baySeq",], df[df$Method == "ShrinkBayes",], 
+         df[df$Method == "stan_corr",], df[df$Method == "stan",])
   df =  df[rep(1:dim(df)[1], each = 10),]
 
   a = cbind(a, Mean = df$Mean, Lower = df$Lower, Upper = df$Upper)
