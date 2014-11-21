@@ -19,3 +19,5 @@ local/
 log/
 roc/
 simulations/
+.Rproj.user
+*.Rproj
