@@ -1,4 +1,4 @@
-simulator = function(which.datasets = 1:10, sample.size = 4, n.keep = 25000){
+simulator = function(which.datasets = 1:10, sample.size = 4, n.keep = work.parms("keep")){
   
   set.seed(10292014+sample.size)
   seeds = sample.int(1e8, 50)

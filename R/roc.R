@@ -1,33 +1,26 @@
-pr = Vectorize(function(cutoff, pvals, n){
+pr = Vectorize(function(cutoff, ranks, n){
   sum(pvals <= cutoff)/n
 }, "cutoff")
 
-roc = function(pv, truth){
-  truth = truth[order(pv)]
-  pv = sort(pv)
+roc = function(ranks, truth){
+  truth = truth[order(ranks)]
+  ranks = sort(ranks)
 
-  pvals.false = pv[truth == 0]
-  pvals.true = pv[truth != 0]
+  ranks.false = ranks[truth == 0]
+  ranks.true = ranks[truth != 0]
 
-  fpr = pr(pv, pvals.false, length(pvals.false))
-  tpr = pr(pv, pvals.true, length(pvals.true))
+  fpr = pr(ranks, ranks.false, length(ranks.false))
+  tpr = pr(ranks, ranks.true, length(ranks.true))
 
   data.frame(fpr = fpr, tpr = tpr)
 }
 
-rocs = function(which.datasets = 1:10, which.sizes = c(4, 8, 16), pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan_corr", "stan")){
-  for(pkg in pkgs){
-    for(s in which.sizes){
-      for(i in which.datasets){
-        print(paste(s, i))      
-        logfile(pkg, "ROC dataset", i, s)
-        pvals = readRDS(paste("../pvals/", pkg, i, "-", s, ".rds", sep=""))
-        truth = readRDS(paste("../simulations/truth", i, "-", s, ".rds", sep=""))^2
-        saveRDS(roc(pvals, truth), paste("../roc/", pkg, i, "-", s, ".rds", sep=""))
-      }
-    }
-  }
-}
+rocs = Vectorize(function(mtd, size, rep){
+  print(paste("ROC", mtd, s, i))
+  ranks = readRDS(paste("../pvals/", pkg, i, "-", s, ".rds", sep=""))
+  truth = readRDS(paste("../simulations/truth", i, "-", s, ".rds", sep=""))^2
+  saveRDS(roc(ranks, truth), paste("../roc/", pkg, i, "-", s, ".rds", sep=""))
+}, c("mtd", "size", "rep"))
 
 auc = function(.roc, upper = 1e-1){
   m = max(which(.roc$fpr <= upper))
@@ -36,7 +29,7 @@ auc = function(.roc, upper = 1e-1){
   sum(.roc$tpr[l] * (.roc$fpr[u] - .roc$fpr[l]))
 }
 
-aucs = function(which.datasets = 1:10, which.sizes = c(4, 8, 16), pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan_corr", "stan")){
+aucs = function(which.datasets = 1:10, which.sizes = c(4, 8, 16), pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan_corr", "stan", "stan_horseshoe")){
   ret = NULL
   for(pkg in pkgs){
     for(s in which.sizes){

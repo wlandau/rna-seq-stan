@@ -11,7 +11,7 @@ prepFDRdf = function(fdr, upper = 0.15, npts = 100, pkg, sample.size, rep){
   return(apxfdr)
 }
 
-fdr = function(pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan_corr", "stan"), sample.sizes = c(4, 8, 16), reps = 1:10, jarad = T, dan = T){
+fdr = function(pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan_corr", "stan", "stan_horseshoe"), sample.sizes = c(4, 8, 16), reps = 1:10, jarad = T, dan = T){
 
   for(pkg in pkgs)
     for(sample.size in sample.sizes)
