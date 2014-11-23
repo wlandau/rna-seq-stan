@@ -14,7 +14,7 @@
 .Rhistory
 auc/
 fdr/
-pvals/
+ranks/
 local/
 log/
 roc/
