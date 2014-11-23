@@ -55,7 +55,7 @@ fdr = function(people = c("dan", "jarad"),
       fdr.minus.cutoff = do.call("c", .fdr$fdr.minus.cutoff),
       mtd = ordered(do.call("c", lapply(.fdr$mtd, as.character)), levels = rev(work.parms("mtd"))),
       size.short = ordered(do.call("c", .fdr$size), work.parms("size")),
-      size = ordered(do.call("c", .fdr$size), labels = paste(work.parms("size"), "samples per group")),
+      size = ordered(do.call("c", .fdr$size), labels = paste(work.parms("size"), "samples / group")),
       rep = do.call("c", .fdr$rep)
     )
 

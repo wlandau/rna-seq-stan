@@ -11,7 +11,7 @@ exampleROCdf = function(upper = 1e-1){
     fpr = do.call("c", l$fpr),
     tpr = do.call("c", l$tpr),
     mtd = ordered(do.call("c", lapply(l$mtd, as.character)), levels = rev(work.parms("mtd"))),
-    size = ordered(do.call("c", l$size), labels = paste(work.parms("size"), "samples per group"))
+    size = ordered(do.call("c", l$size), labels = paste(work.parms("size"), "samples / group"))
   )
 }
 
@@ -25,7 +25,7 @@ plotExampleROC = function(upper = c(1e-1, 1)){
            xlab("\nFalse positive rate (FPR)") + 
            ylab("True positive rate (TPR)\n") + 
            theme(axis.text = element_text(family = "Helvetica", color = 'black'),
-                      axis.text.x = element_text(angle = -45, hjust = 0),
+                      axis.text.x = element_text(angle = -80, hjust = 0),
                       panel.background = element_rect(fill='white'),
                       panel.border = element_rect(color="black", fill = NA),
                       panel.grid.major = element_line(color="lightgray"),
@@ -42,7 +42,7 @@ plotAUCfacet = function(facet.by.size = c(T, F)){
     if(facet.by.size){
       pl = ggplot(df, aes(x = mtd, y = auc)) +
              facet_grid(~ size, scales = "free_x") + 
-             theme(axis.text.x = element_text(angle = -45, hjust = 0)) + 
+             theme(axis.text.x = element_text(angle = -80, hjust = 0)) + 
              xlab("\nMethod")
     } else {
       pl = ggplot(df, aes(x = size.short, y = auc)) +
@@ -64,13 +64,12 @@ plotAUCfacet = function(facet.by.size = c(T, F)){
   }, "facet.by.size")(facet.by.size)
 }
 
-
 plotAUCcolor = function(jitter = c(T, F)){
   Vectorize(function(jitter){
     df = readRDS("../auc/auc.rds")
     df$mtd = ordered(df$mtd, rev(work.parms("mtd")))
     
-    pl = ggplot(df, aes(x = size, y = auc, color = mtd), na.rm=TRUE) +
+    pl = ggplot(df, aes(x = size.short, y = auc, color = mtd), na.rm=TRUE) +
            geom_crossbar(aes(ymin = lower, y = mean, ymax = upper), fatten = 1, width = .25) + 
            labs(color = "Method") +
            xlab("\nSample Size per Treatment Group") +
@@ -100,7 +99,8 @@ plotFDRfacet = function(facet.direction = c(T, F), who = c("dan", "jarad")){
            geom_abline(slope = 0, intercept = 0, color = "blue") + 
            geom_line(aes(group = rep), alpha = 0.5) + 
            xlab("\nCutoff (p-value or posterior probability)") + 
-           ylab("FDR - cutoff\n")
+           ylab("FDR - cutoff\n") + 
+           theme(axis.text.x = element_text(angle = -80, hjust = 0))
 
     if(facet.direction) pl = pl + facet_grid(mtd ~ size) else pl = pl + facet_grid(size ~ mtd)
 
@@ -120,9 +120,10 @@ plotFDRindiv = function(who = c("dan", "jarad"), mtd = work.parms("mtd")){
            geom_abline(slope = 0, intercept = 0, color = "blue") + 
            geom_line(aes(group = rep), alpha = 0.5) + 
            xlab("\nCutoff (p-value or posterior probability)") + 
-           ylab(paste("FDR - cutoff (", mtd, ")\n", sep=""))
+           ylab(paste("FDR - cutoff (", mtd, ")\n", sep="")) +
+           theme(axis.text.x = element_text(angle = -80, hjust = 0))
 
-     ggsave(paste("../fig/fdr-indiv-",who, "-", mtd, "-", facet.direction, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+     ggsave(paste("../fig/fdr-indiv-",who, "-", mtd, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   })(grid[[1]], grid[[2]])
 }
 

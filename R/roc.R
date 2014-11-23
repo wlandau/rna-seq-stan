@@ -43,7 +43,7 @@ aucs = function(mtd = work.parms("mtd"), size = work.parms("size"), rep = work.p
   ret$auc = as.numeric(as.vector(ret$auc))
   ret$mtd = ordered(ret$mtd, labels = work.parms("mtd"))
   ret$size.short = ordered(ret$size, levels = work.parms("size"))
-  ret$size = ordered(ret$size.short, labels = paste(work.parms("size"), "samples per group"))
+  ret$size = ordered(ret$size.short, labels = paste(work.parms("size"), "samples / group"))
 
   smry = ddply(ret, .variables = .(mtd, size), .fun = function(x){
     c(mean(x$auc), mean(x$auc) + c(-1, 1) * 1.96  * sd(x$auc)/sqrt(length(x$auc)))

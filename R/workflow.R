@@ -3,12 +3,12 @@
 
 source("setup.R")
 
-#for(sample.size in sample.sizes)
-#  simulator(sample.size = sample.size)
+#for(size in work.parms("size"))
+#  simulator(size = size)
 
-#pvals(which.datasets, ncpus, sample.sizes)
 #unpack.stan()
+#ranks(reps = reps.on.server)
 #rocs()
-#aucs(which.datasets, sample.sizes)
-
+#aucs()
+#fdr()
 makePlots()

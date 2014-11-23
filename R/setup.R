@@ -7,18 +7,17 @@ for(dir in c("../auc", "../data/", "../fdr", "../fig",  "../log", "../pvals", ".
     dir.create(dir)
 
 host = System$getHostname()
-sample.sizes = c(4, 8, 16)
 
 if(host == "impact2.stat.iastate.edu"){ 
   ncpus = 4
-  which.datasets = 1:2
+  reps.on.server = 1:2
 } else if(host == "impact3.stat.iastate.edu") {
   ncpus = 6
-  which.datasets = 3:6
+  reps.on.server = 3:6
 } else if(host == "impact4.stat.iastate.edu") {
   ncpus = 6
-  which.datasets = 7:10
+  reps.on.server = 7:10
 } else {
   ncpus = 2
-  which.datasets = 1:2
+  reps.on.server = 1:2
 }
