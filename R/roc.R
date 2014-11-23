@@ -1,5 +1,5 @@
-pr = Vectorize(function(cutoff, ranks, n){
-  sum(pvals <= cutoff)/n
+fpr.point = Vectorize(function(cutoff, ranks, n){
+  sum(ranks <= cutoff)/n
 }, "cutoff")
 
 roc = function(ranks, truth){
@@ -9,18 +9,21 @@ roc = function(ranks, truth){
   ranks.false = ranks[truth == 0]
   ranks.true = ranks[truth != 0]
 
-  fpr = pr(ranks, ranks.false, length(ranks.false))
-  tpr = pr(ranks, ranks.true, length(ranks.true))
+  fpr = fpr.point(ranks, ranks.false, length(ranks.false))
+  tpr = fpr.point(ranks, ranks.true, length(ranks.true))
 
   data.frame(fpr = fpr, tpr = tpr)
 }
 
-rocs = Vectorize(function(mtd, size, rep){
-  print(paste("ROC", mtd, s, i))
-  ranks = readRDS(paste("../pvals/", pkg, i, "-", s, ".rds", sep=""))
-  truth = readRDS(paste("../simulations/truth", i, "-", s, ".rds", sep=""))^2
-  saveRDS(roc(ranks, truth), paste("../roc/", pkg, i, "-", s, ".rds", sep=""))
-}, c("mtd", "size", "rep"))
+rocs = function(mtd = work.parms("mtd"), size = work.parms("size"), rep = work.parms("rep")){
+  irrelevance = loopify(function(mtd, size, rep){
+    print(paste("ROC", mtd, size, rep))
+    name = file.name(mtd, size, rep)
+    ranks = readRDS(paste("../ranks/", name, sep=""))
+    truth = readRDS(paste("../simulations/", file.name("truth", size, rep), sep=""))^2
+    saveRDS(roc(ranks, truth), paste("../roc/", name, sep=""))
+  }, mtd, size, rep)
+}
 
 auc = function(.roc, upper = 1e-1){
   m = max(which(.roc$fpr <= upper))
@@ -29,23 +32,24 @@ auc = function(.roc, upper = 1e-1){
   sum(.roc$tpr[l] * (.roc$fpr[u] - .roc$fpr[l]))
 }
 
-aucs = function(which.datasets = 1:10, which.sizes = c(4, 8, 16), pkgs = c("edgeR", "baySeq", "ShrinkBayes", "stan_corr", "stan", "stan_horseshoe")){
-  ret = NULL
-  for(pkg in pkgs){
-    for(s in which.sizes){
-      for(i in which.datasets){
-        print(paste(s, i))
-        logfile(pkg, "AUC dataset", i, s)
-        .roc = readRDS(paste("../roc/", pkg, i, "-", s, ".rds", sep=""))
-        .auc = auc(.roc)
-        ret = rbind(ret, c(.auc, pkg, i, s))
-      }   
-    }
-  }
+aucs = function(mtd = work.parms("mtd"), size = work.parms("size"), rep = work.parms("rep")){
+  ret = loopify(function(mtd, size, rep){
+    print(paste("AUC", mtd, size, rep))
+    .auc = auc(readRDS(paste("../roc/", file.name(mtd, size, rep), sep="")))
+    c(.auc, mtd, size, rep)
+  }, mtd, size, rep)
 
-  ret = data.frame(ret)
-  colnames(ret) = c("AUC", "Method", "Replicate", "SampleSize")
-  ret$AUC = as.numeric(as.vector(ret$AUC))
-  
+  colnames(ret) = c("auc", "mtd", "size", "rep")
+  ret$auc = as.numeric(as.vector(ret$auc))
+  ret$mtd = ordered(ret$mtd, labels = work.parms("mtd"))
+  ret$size.short = ordered(ret$size, levels = work.parms("size"))
+  ret$size = ordered(ret$size.short, labels = paste(work.parms("size"), "samples per group"))
+
+  smry = ddply(ret, .variables = .(mtd, size), .fun = function(x){
+    c(mean(x$auc), mean(x$auc) + c(-1, 1) * 1.96  * sd(x$auc)/sqrt(length(x$auc)))
+  })
+  smry = smry[rep(1:dim(smry)[1], each = 10),]
+
+  ret = cbind(ret, mean = smry$V1, lower = smry$V2, upper = smry$V3)
   saveRDS(ret, "../auc/auc.rds")
 }

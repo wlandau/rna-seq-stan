@@ -6,9 +6,9 @@ source("setup.R")
 #for(sample.size in sample.sizes)
 #  simulator(sample.size = sample.size)
 
-#unpack.stan()
 #pvals(which.datasets, ncpus, sample.sizes)
-#rocs(which.datasets, sample.sizes)
+#unpack.stan()
+#rocs()
 #aucs(which.datasets, sample.sizes)
 
 makePlots()
