@@ -285,12 +285,13 @@ P(M_2 \mid \text{data}) \ + \\ P(M_5 \mid \text{data}) & \text{otherwise}
 
 \section{The contest}
 
-\subsection{ROC (receiver operating characteristic) curves}
+\subsection{Constructing ROC curves}
 
 \begin{frame}
 \frametitle{Calculating false positive rate (FPR) and true positive rate (TPR)}
 
 \begin{itemize}
+\item ROC = Receiver Operating Characteristic
 \item $N_{\text{true}}$ heterosis features, $N_{\text{false}}$ null features.
 \pause \item Results of testing each feature for heterosis (25000 columns here):
 \end{itemize}
@@ -344,7 +345,7 @@ FPR = \frac{1}{N_{false}} \qquad TPR = \frac{2}{N_{true}}
 
 
 
-\subsection{The results}
+\subsection{ROC results}
 
 \begin{frame}
 \frametitle{Areas under ROC curves}
@@ -359,5 +360,53 @@ FPR = \frac{1}{N_{false}} \qquad TPR = \frac{2}{N_{true}}
 \includegraphics[scale=0.5]{auc2}
 \end{center}
 \end{frame}
+
+
+\subsection{FDR control procedures}
+
+\begin{frame}
+\frametitle{FDR control procedures}
+
+\begin{itemize}
+\item Let $p_{(f)}$ ($f = 1, \ldots, 25000)$ be the ordered ranks 
+\begin{itemize}
+\item For {\tt edgeR}, the ranks are now q-values.
+\item For the other methods, take p(no heterosis $|$ data) for each feature.
+\end{itemize}
+\pause \item Let $I_{(f)}$ = I(feature of $p_{(f)}$ is not heterosis)
+\item Method 1:
+\begin{align*}
+\ov{p}_m = \frac{1}{m} \sum_{f = 1}^m p_{(f)} \qquad \ov{I}_m = \frac{1}{m}\sum_{f = 1}^m I_{(f)}
+\end{align*}
+\begin{itemize}
+\pause \item To control FDR, we need $\ov{I}_m \le \ov{p}_m$.
+\item Plot $\ov{I}_m - \ov{p}_m$ vs $\ov{p}_m$ for multiple $m$.
+\end{itemize}
+
+\pause \item Method 2:
+
+\begin{align*}
+\ov{p}_m = \frac{1}{100} \sum_{f = m}^{m + 100} p_{(f)} \qquad \ov{I}_m = \frac{1}{100}\sum_{f = m}^{m + 100} I_{(f)}
+\end{align*}
+\end{itemize}
+\end{frame}
+
+\subsection{FDR control results}
+
+
+\begin{frame}
+\frametitle{Method 1}
+\begin{center}
+\includegraphics[scale=0.5]{fdr-method1stan}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Method 2}
+\begin{center}
+\includegraphics[scale=0.5]{fdr-method2stan}
+\end{center}
+\end{frame}
+
 
 \end{document}
