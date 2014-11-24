@@ -131,7 +131,27 @@ We calculate estimates $\wh{\mu}_{f, t}$ for $f = 1, \ldots, 25000$ and $t = 1, 
 
 \section{ROC curves}
 
-\paragraph{} We use receiver operating characteristic (ROC) curves to compare the effectiveness of our method versus {\tt edgeR}, {\tt ShrinkBayes}, and {\tt baySeq}. A ROC curve is a tool for measuring the effectiveness of a binary classifier. It is a graph of the true positive rate (TPR) of detection against the false positive rate (FPR), so a high area under the curve (AUC) is favorable. Landau and Liu \cite{LandauLiu} describe most of the details of calculation. However, note that in this study, posterior probabilities sometimes replace p-values, and we test for heterosis, not differential expression.
+\paragraph{} We use receiver operating characteristic (ROC) curves to compare the effectiveness of our method versus {\tt edgeR}, {\tt ShrinkBayes}, and {\tt baySeq}. A ROC curve is a tool for measuring the effectiveness of a binary classifier. It is a graph of the true positive rate (TPR) of detection against the false positive rate (FPR), so a high area under the curve (AUC) is favorable. Landau and Liu \cite{LandauLiu} describe most of the details of calculation. However, note that in this study, posterior probabilities replace p-values for the Bayesian methods, and we test for heterosis, not differential expression.
+
+\section{FDR control procedure 1}
+
+\paragraph{} We check if our method is controlling the false discovery rate (FDR) of detecting heterosis features. For a given $m$ between $1$ and 25000, let
+
+\begin{align*}
+\ov{p}_m = \frac{1}{m} \sum_{f = 1}^m p_{(f)} \qquad \ov{I}_m = \frac{1}{m}\sum_{f = 1}^m I_{(f)}.
+\end{align*}
+
+FDR is controlled at $\ov{p}_m$ if $\ov{I}_m \le \ov{p}_m$. To check FDR control, we plot $\ov{I}_m - \ov{p}_m$ versus $\ov{p}_m$ for $0 \le \ov{p}_m \le 0.15$.
+
+\section{FDR control procedure 2}
+
+\paragraph{} This is the same FDR control procedure 1, except that
+
+\begin{align*}
+\ov{p}_m = \frac{1}{100} \sum_{f = m}^{m + 100} p_{(f)} \qquad \ov{I}_m = \frac{1}{100}\sum_{f = m}^{m + 100} I_{(f)}
+\end{align*}
+
+and $m$ is between 1 and $24900$.
 
 \end{flushleft}
 
