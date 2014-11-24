@@ -293,7 +293,13 @@ P(M_2 \mid \text{data}) \ + \\ P(M_5 \mid \text{data}) & \text{otherwise}
 \begin{itemize}
 \item ROC = Receiver Operating Characteristic
 \item $N_{\text{true}}$ heterosis features, $N_{\text{false}}$ null features.
-\pause \item Results of testing each feature for heterosis (25000 columns here):
+\pause \item Results of testing each feature for heterosis
+\begin{itemize}
+\item For {\tt edgeR}, the ranks are p-values.
+\item For the other methods, take p(no heterosis $|$ data) for each feature.
+\end{itemize}
+
+
 \end{itemize}
 
 \begin{tabular}{l|l|l|l|l|l|l|l}
@@ -303,7 +309,7 @@ truth &  0 & 0 & 1 & 1 & $\cdots$ & 1 & 0
 
 \begin{itemize}
 
-\pause \item Sort table by p-value (or other binary classifier)
+\pause \item Sort table by rank.
 \end{itemize}
 
 \begin{tabular}{l|l|l|l|l|l|l|l}
@@ -316,7 +322,7 @@ truth &  1 & 1 & 0 & 1 & $\cdots$ & 0 & 0
 \frametitle{Calculating false positive rate (FPR) and true positive rate (TPR)}
 
 \begin{itemize}
-\pause \item In practice, we would declare the lowest-p-value features to have heterosis.
+\pause \item In practice, we would declare the lowest-rank features to have heterosis.
 \end{itemize}
 
 \pause \begin{tabular}{l|l|l|l|l|l|l|l}
