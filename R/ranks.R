@@ -145,7 +145,7 @@ ranks = function(mtds = c("edgeR", "baySeq", "ShrinkBayes"), sizes = c(4, 8, 16)
       group = as.factor(rep(c("parent1", "parent2", "hybrid"), each = size))
 
       for(rep in reps){
-        logfile(mtd, "ranks ", size, rep)
+        logfile(mtd, "ranks", size, rep)
         cts = readRDS(paste("../simulations/", file.name("sim", size, rep), sep=""))
         saveRDS(ranks1dataset(mtd, cts, group, ncpus = ncpus), paste("../ranks/", file.name(mtd, size, rep), sep=""))
       }
