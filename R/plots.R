@@ -89,21 +89,32 @@ plotAUCcolor = function(jitter = c(T, F)){
   }, "jitter")(jitter)
 }
 
-plotFDRfacet = function(facet.direction = c(T, F), who = c("dan", "jarad"), y.axis = c("subtract", "leave")){
-  grid = expand.grid(who, facet.direction, y.axis)
+plotFDRfacet = function(facet.direction = c(T, F), who = c("dan", "jarad"), y.axis = c("subtract", "leave"),
+reverse.x = c(" ", " no ")){
+  grid = expand.grid(who, facet.direction, y.axis, reverse.x)
   
-  Vectorize(function(who, facet.direction, y.axis){
+  Vectorize(function(who, facet.direction, y.axis, reverse.x){
     d = readRDS(paste("../fdr/",who, ".rds", sep=""))
+  
+    if(who == "dan") reverse.x = " no "
 
-    x.lab = ifelse(who == "dan", "est. Bayesian FDR", "mean post. probability of heterosis")
+    x.lab = ifelse(who == "dan", "est. Bayesian FDR", paste("mean post. probability of", reverse.x, "heterosis", sep=""))
     y.lab = ifelse(y.axis == "subtract", paste("FDP", "-", x.lab), "FDP")
 
-    if(y.axis == "leave")
+    if(y.axis == "leave" && reverse.x == " no ")
       pl = ggplot(d, aes(x = cutoff, y = fdr)) 
-    else if(y.axis == "subtract")
+    else if(y.axis == "subtract" && reverse.x == " no ")
       pl = ggplot(d, aes(x = cutoff, y = fdr.minus.cutoff))  
+    else if(y.axis == "leave" && reverse.x == " ")
+      pl = ggplot(d, aes(x = one.minus.cutoff, y = fdr)) 
+    else if(y.axis == "subtract" && reverse.x == " ")
+      pl = ggplot(d, aes(x = one.minus.cutoff, y = fdr.minus.cutoff))
 
-    pl = pl + geom_abline(slope = as.integer(y.axis == "leave"), intercept = 0, color = "blue") + 
+print(paste((-1)^(reverse.x == " ") * as.integer(y.axis == "leave"), as.integer(reverse.x == " ") * as.integer(y.axis == "leave")))
+
+    pl = pl + geom_abline(slope = (-1)^(reverse.x == " ") * as.integer(y.axis == "leave"), 
+                                 intercept = as.integer(reverse.x == " ") * as.integer(y.axis == "leave"), 
+                                 color = "blue") + 
            geom_line(aes(group = rep), alpha = 0.5) + 
            xlab(paste("\n", x.lab, sep="")) + 
            ylab(paste(y.lab, "\n", sep="")) + 
@@ -111,34 +122,49 @@ plotFDRfacet = function(facet.direction = c(T, F), who = c("dan", "jarad"), y.ax
 
     if(facet.direction) pl = pl + facet_grid(mtd ~ size) else pl = pl + facet_grid(size ~ mtd)
 
-     ggsave(paste("../fig/fdr-facet-",who, "-", facet.direction, "-", y.axis, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
-  })(grid[[1]], grid[[2]], grid[[3]])
+     if(reverse.x == " ")
+    pl = pl + scale_x_reverse()
+
+     ggsave(paste("../fig/fdr-facet-",who, "-", facet.direction, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+  })(grid[[1]], grid[[2]], grid[[3]], grid[[4]])
 }
 
-plotFDRindiv = function(who = c("dan", "jarad"), mtd = work.parms("mtd"), y.axis = c("subtract", "leave")){
-  grid = expand.grid(who, mtd, y.axis)
+plotFDRindiv = function(who = c("dan", "jarad"), mtd = work.parms("mtd"), y.axis = c("subtract", "leave"), 
+reverse.x = c(" ", " no ")){
+  grid = expand.grid(who, mtd, y.axis, reverse.x)
   
-  Vectorize(function(who, mtd, y.axis){
+  Vectorize(function(who, mtd, y.axis, reverse.x){
     d = readRDS(paste("../fdr/",who, ".rds", sep=""))
     d = d[d$mtd == mtd,]
 
-    x.lab = ifelse(who == "dan", "est. Bayesian FDR", "mean post. probability of heterosis")
+    if(who == "dan") reverse.x = " no "
+
+    x.lab = ifelse(who == "dan", "est. Bayesian FDR", paste("mean post. probability of", reverse.x, "heterosis", sep=""))
     y.lab = ifelse(y.axis == "subtract", paste("FDP", "-", x.lab), "FDP")
 
-    if(y.axis == "leave")
+    if(y.axis == "leave" && reverse.x == " no ")
       pl = ggplot(d, aes(x = cutoff, y = fdr)) 
-    else if(y.axis == "subtract")
+    else if(y.axis == "subtract" && reverse.x == " no ")
       pl = ggplot(d, aes(x = cutoff, y = fdr.minus.cutoff))  
+    else if(y.axis == "leave" && reverse.x == " ")
+      pl = ggplot(d, aes(x = one.minus.cutoff, y = fdr)) 
+    else if(y.axis == "subtract" && reverse.x == " ")
+      pl = ggplot(d, aes(x = one.minus.cutoff, y = fdr.minus.cutoff))
 
     pl = pl + facet_grid(~ size) +
-           geom_abline(slope = as.integer(y.axis == "leave"), intercept = 0, color = "blue") + 
+           geom_abline(slope = (-1)^(reverse.x == " ") * as.integer(y.axis == "leave"), 
+                                 intercept = as.integer(reverse.x == " ") * as.integer(y.axis == "leave"), 
+                                 color = "blue") + 
            geom_line(aes(group = rep), alpha = 0.5) + 
            xlab(paste("\n", x.lab, sep="")) + 
            ylab(paste(y.lab, "\n", sep="")) + 
            theme(axis.text.x = element_text(angle = -80, hjust = 0))
 
-     ggsave(paste("../fig/fdr-indiv-",who, "-", mtd, "-", y.axis, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
-  })(grid[[1]], grid[[2]], grid[[3]])
+    if(reverse.x == " ")
+      pl = pl + scale_x_reverse()
+
+     ggsave(paste("../fig/fdr-indiv-",who, "-", mtd, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+  })(grid[[1]], grid[[2]], grid[[3]], grid[[4]])
 }
 
 makePlots = function(){
