@@ -98,8 +98,12 @@ plotFDRfacet = function(facet.direction = c(T, F), who = c("dan", "jarad"), y.ax
     x.lab = ifelse(who == "dan", "est. Bayesian FDR", "mean post. probability of heterosis")
     y.lab = ifelse(y.axis == "subtract", paste("FDP", "-", x.lab), "FDP")
 
-    pl = ggplot(d, aes(x = cutoff, y = fdr.minus.cutoff)) + 
-           geom_abline(slope = as.integer(y.axis == "leave"), intercept = 0, color = "blue") + 
+    if(y.axis == "leave")
+      pl = ggplot(d, aes(x = cutoff, y = fdr)) 
+    else if(y.axis == "subtract")
+      pl = ggplot(d, aes(x = cutoff, y = fdr.minus.cutoff))  
+
+    pl = pl + geom_abline(slope = as.integer(y.axis == "leave"), intercept = 0, color = "blue") + 
            geom_line(aes(group = rep), alpha = 0.5) + 
            xlab(paste("\n", x.lab, sep="")) + 
            ylab(paste(y.lab, "\n", sep="")) + 
@@ -121,8 +125,12 @@ plotFDRindiv = function(who = c("dan", "jarad"), mtd = work.parms("mtd"), y.axis
     x.lab = ifelse(who == "dan", "est. Bayesian FDR", "mean post. probability of heterosis")
     y.lab = ifelse(y.axis == "subtract", paste("FDP", "-", x.lab), "FDP")
 
-    pl = ggplot(d, aes(x = cutoff, y = fdr.minus.cutoff)) + 
-          facet_grid(~ size) +
+    if(y.axis == "leave")
+      pl = ggplot(d, aes(x = cutoff, y = fdr)) 
+    else if(y.axis == "subtract")
+      pl = ggplot(d, aes(x = cutoff, y = fdr.minus.cutoff))  
+
+    pl = pl + facet_grid(~ size) +
            geom_abline(slope = as.integer(y.axis == "leave"), intercept = 0, color = "blue") + 
            geom_line(aes(group = rep), alpha = 0.5) + 
            xlab(paste("\n", x.lab, sep="")) + 
