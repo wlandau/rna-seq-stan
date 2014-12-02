@@ -7,7 +7,7 @@ source("setup.R")
 #  simulator(size = size)
 
 #unpack.stan()
-ranks(mtds = "ShrinkBayes", reps = reps.on.server)
+ranks(mtds = "ShrinkBayes", reps = reps.on.server, ncpus = ncpus)
 #rocs()
 #aucs()
 #fdr()
