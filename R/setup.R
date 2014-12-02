@@ -8,15 +8,18 @@ for(dir in c("../auc", "../data/", "../fdr", "../fig",  "../log", "../pvals", ".
 
 host = System$getHostname()
 
-if(host == "impact2.stat.iastate.edu"){ 
-  ncpus = 4
-  reps.on.server = 1:2
+if(host == "impact1.stat.iastate.edu"){
+  ncups = 6
+  reps.on.server = 1:5
+} else if(host == "impact2.stat.iastate.edu"){ 
+  ncpus = 6
+  reps.on.server = 6:10
 } else if(host == "impact3.stat.iastate.edu") {
   ncpus = 6
-  reps.on.server = 3:6
+#  reps.on.server = 8:10
 } else if(host == "impact4.stat.iastate.edu") {
   ncpus = 6
-  reps.on.server = 7:10
+#  reps.on.server = 7:10
 } else {
   ncpus = 2
   reps.on.server = 1:2

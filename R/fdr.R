@@ -32,9 +32,6 @@ fdr = function(people = c("dan", "jarad"),
         ranks = readRDS(paste("../ranks/", file.name(mtd, size, rep), sep="")),
         truth = 1 - abs(readRDS(paste("../simulations/", file.name("truth", size, rep), sep=""))))
       
-      if(mtd == "edgeR")
-        d$ranks = qvalue(d$ranks)$qvalues
-      
       d = d[order(d$ranks),]
      
       if(who == "dan")
@@ -51,6 +48,7 @@ fdr = function(people = c("dan", "jarad"),
 
     ret = data.frame(
       cutoff = do.call("c", .fdr$cutoff),
+      one.minus.cutoff = 1 - do.call("c", .fdr$cutoff),
       fdr = do.call("c", .fdr$fdr),
       fdr.minus.cutoff = do.call("c", .fdr$fdr.minus.cutoff),
       mtd = ordered(do.call("c", lapply(.fdr$mtd, as.character)), levels = rev(work.parms("mtd"))),

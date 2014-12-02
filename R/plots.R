@@ -89,42 +89,48 @@ plotAUCcolor = function(jitter = c(T, F)){
   }, "jitter")(jitter)
 }
 
-plotFDRfacet = function(facet.direction = c(T, F), who = c("dan", "jarad")){
-  grid = expand.grid(who, facet.direction)
+plotFDRfacet = function(facet.direction = c(T, F), who = c("dan", "jarad"), y.axis = c("subtract", "leave")){
+  grid = expand.grid(who, facet.direction, y.axis)
   
-  Vectorize(function(who, facet.direction){
+  Vectorize(function(who, facet.direction, y.axis){
     d = readRDS(paste("../fdr/",who, ".rds", sep=""))
 
+    x.lab = ifelse(who == "dan", "est. Bayesian FDR", "mean post. probability of heterosis")
+    y.lab = ifelse(y.axis == "subtract", paste("FDP", "-", x.lab), "FDP")
+
     pl = ggplot(d, aes(x = cutoff, y = fdr.minus.cutoff)) + 
-           geom_abline(slope = 0, intercept = 0, color = "blue") + 
+           geom_abline(slope = as.integer(y.axis == "leave"), intercept = 0, color = "blue") + 
            geom_line(aes(group = rep), alpha = 0.5) + 
-           xlab("\nCutoff (p-value or posterior probability)") + 
-           ylab("FDR - cutoff\n") + 
+           xlab(paste("\n", x.lab, sep="")) + 
+           ylab(paste(y.lab, "\n", sep="")) + 
            theme(axis.text.x = element_text(angle = -80, hjust = 0))
 
     if(facet.direction) pl = pl + facet_grid(mtd ~ size) else pl = pl + facet_grid(size ~ mtd)
 
-     ggsave(paste("../fig/fdr-facet-",who, "-", facet.direction, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
-  })(grid[[1]], grid[[2]])
+     ggsave(paste("../fig/fdr-facet-",who, "-", facet.direction, "-", y.axis, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+  })(grid[[1]], grid[[2]], grid[[3]])
 }
 
-plotFDRindiv = function(who = c("dan", "jarad"), mtd = work.parms("mtd")){
-  grid = expand.grid(who, mtd)
+plotFDRindiv = function(who = c("dan", "jarad"), mtd = work.parms("mtd"), y.axis = c("subtract", "leave")){
+  grid = expand.grid(who, mtd, y.axis)
   
-  Vectorize(function(who, mtd){
+  Vectorize(function(who, mtd, y.axis){
     d = readRDS(paste("../fdr/",who, ".rds", sep=""))
     d = d[d$mtd == mtd,]
 
+    x.lab = ifelse(who == "dan", "est. Bayesian FDR", "mean post. probability of heterosis")
+    y.lab = ifelse(y.axis == "subtract", paste("FDP", "-", x.lab), "FDP")
+
     pl = ggplot(d, aes(x = cutoff, y = fdr.minus.cutoff)) + 
           facet_grid(~ size) +
-           geom_abline(slope = 0, intercept = 0, color = "blue") + 
+           geom_abline(slope = as.integer(y.axis == "leave"), intercept = 0, color = "blue") + 
            geom_line(aes(group = rep), alpha = 0.5) + 
-           xlab("\nCutoff (p-value or posterior probability)") + 
-           ylab(paste("FDR - cutoff (", mtd, ")\n", sep="")) +
+           xlab(paste("\n", x.lab, sep="")) + 
+           ylab(paste(y.lab, "\n", sep="")) + 
            theme(axis.text.x = element_text(angle = -80, hjust = 0))
 
-     ggsave(paste("../fig/fdr-indiv-",who, "-", mtd, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
-  })(grid[[1]], grid[[2]])
+     ggsave(paste("../fig/fdr-indiv-",who, "-", mtd, "-", y.axis, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+  })(grid[[1]], grid[[2]], grid[[3]])
 }
 
 makePlots = function(){

@@ -118,13 +118,17 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
     ret = apply(df, 1, function(x){
       if(abs(x["del"]) < abs(x["alp"]))
         return(0)
-      else if(x["del"] > -x["alp"])
+#    else if(x["del"] > -x["alp"]) # before 12/2/14
+      else if(x["del"] > -x["alp"] && -x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
         return(x["post1"])
-      else if(x["del"] > x["alp"])
+#   else if(x["del"] > x["alp"] && x["alp"] >= 0) # before 12/2/14
+     else if(x["del"] > x["alp"] && x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
         return(x["post2"])
-      else if(x["del"] < x["alp"])
+#    else if(x["del"] < x["alp"]) # before 12/2/14
+      else if(x["del"] < x["alp"] && x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
         return(x["post3"])
-      else if(x["del"] < -x["alp"])
+#    else if(x["del"] < -x["alp"]) # before 12/2/14
+      else if(x["del"] < -x["alp"] && -x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
         return(x["post4"])    
     })
   }
@@ -134,9 +138,9 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
   return(ret)
 }
 
-ranks = function(sizes = c(4, 8, 16), reps = 1:10, ncpus = 2){
+ranks = function(mtds = c("edgeR", "baySeq", "ShrinkBayes"), sizes = c(4, 8, 16), reps = 1:10, ncpus = 2){
   
-  for(mtd in c("edgeR", "baySeq", "ShrinkBayes")){
+  for(mtd in mtds){
     for(size in sizes){
       group = as.factor(rep(c("parent1", "parent2", "hybrid"), each = size))
 
