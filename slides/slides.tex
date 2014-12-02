@@ -119,6 +119,7 @@
 \item {\tt ShrinkBayes}
 \end{itemize}
 \pause \item Compare methods with ROC curves
+ \item Check FDR control
 \end{itemize}
 \end{frame}
 
@@ -292,7 +293,7 @@ P(M_2 \mid \text{data}) \ + \\ P(M_5 \mid \text{data}) & \text{otherwise}
 
 \begin{itemize}
 \item ROC = Receiver Operating Characteristic
-\item $N_{\text{true}}$ heterosis features, $N_{\text{false}}$ null features.
+\pause \item $N_{\text{true}}$ heterosis features, $N_{\text{false}}$ null features.
 \pause \item Results of testing each feature for heterosis
 \begin{itemize}
 \item For {\tt edgeR}, the ranks are p-values.
@@ -309,7 +310,7 @@ truth &  0 & 0 & 1 & 1 & $\cdots$ & 1 & 0
 
 \begin{itemize}
 
-\pause \item Sort table by rank.
+\pause \item Sort by rank.
 \end{itemize}
 
 \begin{tabular}{l|l|l|l|l|l|l|l}
@@ -331,7 +332,7 @@ truth & {\color{blue}1} & {\color{blue}1} & {\color{blue}0} & 1 & $\cdots$ & 0 &
 \end{tabular}
 
 \begin{itemize}
-\pause \item With 2 heterosis genes and 1 null gene,
+\pause \item With 2 heterosis genes and 1 null gene, say,
 
 \begin{align*}
 FPR = \frac{1}{N_{false}} \qquad TPR = \frac{2}{N_{true}}
@@ -401,14 +402,14 @@ FPR = \frac{1}{N_{false}} \qquad TPR = \frac{2}{N_{true}}
 
 
 \begin{frame}
-\frametitle{Method 1}
+\frametitle{Method 1: stan\_laplace}
 \begin{center}
 \includegraphics[scale=0.5]{fdr-method1stan}
 \end{center}
 \end{frame}
 
 \begin{frame}
-\frametitle{Method 2}
+\frametitle{Method 2: stan\_laplace}
 \begin{center}
 \includegraphics[scale=0.5]{fdr-method2stan}
 \end{center}

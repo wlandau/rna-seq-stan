@@ -141,7 +141,7 @@ We calculate estimates $\wh{\mu}_{f, t}$ for $f = 1, \ldots, 25000$ and $t = 1, 
 \ov{p}_m = \frac{1}{m} \sum_{f = 1}^m p_{(f)} \qquad \ov{I}_m = \frac{1}{m}\sum_{f = 1}^m I_{(f)}.
 \end{align*}
 
-FDR is controlled at $\ov{p}_m$ if $\ov{I}_m \le \ov{p}_m$. To check FDR control, we plot $\ov{I}_m - \ov{p}_m$ versus $\ov{p}_m$ for $0 \le \ov{p}_m \le 0.15$.
+We can think of $\ov{p}_m$ as a Bayesian estimate of FDR and $\ov{I}_m$ as the false discovery proportion (FDP). FDR is controlled at $\ov{p}_m$ if $\ov{I}_m \le \ov{p}_m$. To check FDR control, we plot $\ov{I}_m - \ov{p}_m$ versus $\ov{p}_m$ for $0 \le \ov{p}_m \le 0.15$.
 
 \section{FDR control procedure 2}
 
