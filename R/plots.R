@@ -110,9 +110,7 @@ reverse.x = c(" ", " no ")){
     else if(y.axis == "subtract" && reverse.x == " ")
       pl = ggplot(d, aes(x = one.minus.cutoff, y = fdr.minus.cutoff))
 
-print(paste((-1)^(reverse.x == " ") * as.integer(y.axis == "leave"), as.integer(reverse.x == " ") * as.integer(y.axis == "leave")))
-
-    pl = pl + geom_abline(slope = (-1)^(reverse.x == " ") * as.integer(y.axis == "leave"), 
+    pl = pl + geom_abline(slope = as.integer(y.axis == "leave"), 
                                  intercept = as.integer(reverse.x == " ") * as.integer(y.axis == "leave"), 
                                  color = "blue") + 
            geom_line(aes(group = rep), alpha = 0.5) + 
@@ -152,7 +150,7 @@ reverse.x = c(" ", " no ")){
       pl = ggplot(d, aes(x = one.minus.cutoff, y = fdr.minus.cutoff))
 
     pl = pl + facet_grid(~ size) +
-           geom_abline(slope = (-1)^(reverse.x == " ") * as.integer(y.axis == "leave"), 
+           geom_abline(slope = as.integer(y.axis == "leave"), 
                                  intercept = as.integer(reverse.x == " ") * as.integer(y.axis == "leave"), 
                                  color = "blue") + 
            geom_line(aes(group = rep), alpha = 0.5) + 
