@@ -9,17 +9,17 @@ for(dir in c("../auc", "../data/", "../fdr", "../fig",  "../log", "../pvals", ".
 host = System$getHostname()
 
 if(host == "impact1.stat.iastate.edu"){
-  ncups = 6
-  reps.on.server = 1:2
+  ncups = 12
+  reps.on.server = 1:4
 } else if(host == "impact2.stat.iastate.edu"){ 
-  ncpus = 8
-  reps.on.server = 3:5
+  ncpus = 4
+  reps.on.server = 5:6
 } else if(host == "impact3.stat.iastate.edu") {
-  ncpus = 6
-  reps.on.server = 6:7
+  ncpus = 12
+  reps.on.server = 7:10
 } else if(host == "impact4.stat.iastate.edu") {
-  ncpus = 8
-  reps.on.server = 8:10
+  ncpus = 2
+  reps.on.server = 10
 } else {
   ncpus = 2
   reps.on.server = 1:2
