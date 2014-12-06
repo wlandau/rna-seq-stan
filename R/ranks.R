@@ -109,14 +109,14 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
     postsAlp = BFUpdatePosterior(fit, priors, shrinkpara = "alp", ncpus = ncpus)
     postmeansAlp = SummaryWrap(postsAlp, summary="postmean", ncpus = ncpus)
 
-    postsDel = BFUpdatePosterior(fit, priors, shrinkpara = "alp", ncpus = ncpus)
+    postsDel = BFUpdatePosterior(fit, priors, shrinkpara = "del", ncpus = ncpus)
     postmeansDel = SummaryWrap(postsDel, summary="postmean", ncpus = ncpus)
 
     df = cbind(postmeansAlp, postmeansDel, post1, post2, post3, post4)
     colnames(df) = c("alp", "del", paste("post", 1:4, sep=""))
  
     ret = apply(df, 1, function(x){
-      if(abs(x["del"]) < abs(x["alp"]))
+      if(abs(x["del"]) <= abs(x["alp"]))
         return(0)
 #    else if(x["del"] > -x["alp"]) # before 12/2/14
       else if(x["del"] > -x["alp"] && -x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
