@@ -31,7 +31,8 @@ plotExampleROC = function(upper = c(1e-1, 1)){
                       panel.grid.major = element_line(color="lightgray"),
                       text = element_text(family = "Helvetica", colour= "black"))
 
-    ggsave(paste("../fig/exampleROC", upper, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+    ggsave(paste("../fig/exampleROC", gsub("\\.", "_", as.character(upper)),
+                 ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   }, "upper")(upper)
 }
 

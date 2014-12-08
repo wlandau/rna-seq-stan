@@ -241,11 +241,11 @@ p_{f, \text{{\tt edgeR}}} &= \begin{cases}
 
 \begin{align*}
 p_{f, \text{\tt ShrinkBayes}} &= \begin{cases}
-0 & \left |\wh{\delta}_f  \right | < \left | \wh{\alpha}_f  \right | \text{, o.w.:} \\
-P(\delta_f + \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > -\wh{\alpha}_f \\
-P(\delta_f - \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > \wh{\alpha}_f \\
-P(\delta_f - \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < \wh{\alpha}_f \\
-P(\delta_f + \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < -\wh{\alpha}_f
+0 & \left |\wh{\delta}_f  \right | \le \left | \wh{\alpha}_f  \right | \text{, o.w.:} \\
+P(\delta_f + \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > -\wh{\alpha}_f \ge 0 \\
+P(\delta_f - \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > \wh{\alpha}_f \ge 0 \\
+P(\delta_f - \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < \wh{\alpha}_f \le 0 \\
+P(\delta_f + \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < -\wh{\alpha}_f \le 0
 \end{cases}
 \end{align*}
 \end{frame}
@@ -346,7 +346,7 @@ FPR = \frac{1}{N_{false}} \qquad TPR = \frac{2}{N_{true}}
 \begin{frame}
 \frametitle{Example ROC curves}
 \begin{center}
-\includegraphics[scale=0.5]{roc}
+\includegraphics[scale=0.5]{../fig/exampleROC0_1}
 \end{center}
 \end{frame}
 
@@ -357,14 +357,14 @@ FPR = \frac{1}{N_{false}} \qquad TPR = \frac{2}{N_{true}}
 \begin{frame}
 \frametitle{Areas under ROC curves}
 \begin{center}
-\includegraphics[scale=0.5]{auc1}
+\includegraphics[scale=0.5]{../fig/auc-facet-TRUE}
 \end{center}
 \end{frame}
 
 \begin{frame}
 \frametitle{Areas under ROC curves}
 \begin{center}
-\includegraphics[scale=0.5]{auc2}
+\includegraphics[scale=0.5]{../fig/auc-facet-FALSE}
 \end{center}
 \end{frame}
 

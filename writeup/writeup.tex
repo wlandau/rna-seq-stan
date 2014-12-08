@@ -93,18 +93,20 @@ p_{f, 2}/2 & \wh{\mu}_{f, 3} < \wh{\mu}_{f, 2} \le \wh{\mu}_{f, 1} \text{ or } \
 \delta_f &= \mu_{f, 3} - \frac{\mu_{f, 1} + \mu_{f, 2}}{2} \qquad \text{(hybrid effect)} 
 \end{align*}
 
-We use the {\tt ShrinkSeq()} and {\tt FitAllShrink()} functions to fit the model and use {\tt inla.make.lincombs()}, {\tt BFUpdatePosterior()}, and {\tt SummaryWrap()} to calculate posterior probabilities $P(\delta_f + \alpha_f > 0 \ | \ \text{data})$, $P(\delta_f - \alpha_f > 0 \ | \ \text{data})$, $P(\delta_f - \alpha_f < 0 \ | \ \text{data})$, and $P(\delta_f + \alpha_f < 0 \ | \ \text{data})$, along with estimates of $\phi_f$, $\alpha_f$, and $\delta_f$ for $f = 1, \ldots, 25000$. Using this information, we calculate the posterior probability that each feature $f$ is not a heterosis feature,
+We use the {\tt ShrinkSeq()} and {\tt FitAllShrink()} functions to fit the model and use {\tt inla.make.lincombs()}, {\tt BFUpdatePosterior()}, and {\tt SummaryWrap()} to calculate posterior probabilities $P(\delta_f + \alpha_f > 0 \ | \ \text{data})$, $P(\delta_f - \alpha_f > 0 \ | \ \text{data})$, $P(\delta_f - \alpha_f < 0 \ | \ \text{data})$, and $P(\delta_f + \alpha_f < 0 \ | \ \text{data})$, along with estimates of $\phi_f$, $\alpha_f$, and $\delta_f$ for $f = 1, \ldots, 25000$. Using this information, we calculate the posterior probability that each feature $f$ is a heterosis feature,
 
 
 \begin{align*}
-p_{f, {\tt ShrinkBayes}} = \begin{cases}
-1 & |\wh{\delta}_f| < |\wh{\alpha}_f|. \text{ Otherwise,} \\
-P(\delta_f + \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > - \wh{\alpha}_f \\ 
-P(\delta_f - \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > \wh{\alpha}_f \\ 
-P(\delta_f - \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < \wh{\alpha}_f \\ 
-P(\delta_f + \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < - \wh{\alpha}_f \\ 
+p_{f, {\tt ShrinkBayes}}^* = \begin{cases}
+0 & |\wh{\delta}_f| \le |\wh{\alpha}_f|. \text{ Otherwise,} \\
+P(\delta_f + \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > - \wh{\alpha}_f \ge 0 \\
+P(\delta_f - \alpha_f > 0 \mid \text{data}) & \wh{\delta}_f > \wh{\alpha}_f \ge 0 \\
+P(\delta_f - \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < \wh{\alpha}_f \le 0 \\
+P(\delta_f + \alpha_f < 0 \mid \text{data}) & \wh{\delta}_f < - \wh{\alpha}_f \le 0 \\
 \end{cases}
 \end{align*}
+
+Finally, we let $p_{f, {\tt ShrinkBayes}} = 1 - p_{f, {\tt ShrinkBayes}}^*$ be the posterior probability that feature $f$ is not a heterosis feature.
 
 \section{{\tt baySeq}}
 

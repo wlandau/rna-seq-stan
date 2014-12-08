@@ -1,5 +1,5 @@
 work.parms = function(item){
-  mtd = c("edgeR", "ShrinkBayes", "baySeq", "stan_corr", "stan", "stan_laplace")
+  mtd = c("edgeR", "baySeq", "stan_corr", "ShrinkBayes", "stan", "stan_laplace")
   switch(item, 
              "mtd" = ordered(mtd, levels = mtd),
              "size" = c(4, 8, 16),

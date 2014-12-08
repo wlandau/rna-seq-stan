@@ -115,7 +115,7 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
     df = cbind(postmeansAlp, postmeansDel, post1, post2, post3, post4)
     colnames(df) = c("alp", "del", paste("post", 1:4, sep=""))
  
-    ret = apply(df, 1, function(x){
+    ret = 1 - apply(df, 1, function(x){
       if(abs(x["del"]) <= abs(x["alp"]))
         return(0)
 #    else if(x["del"] > -x["alp"]) # before 12/2/14
