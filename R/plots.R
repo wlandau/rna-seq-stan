@@ -1,4 +1,14 @@
-exampleROCdf = function(upper = 1e-1){
+figdir = function(exclude = NULL){
+  ex = paste(paste(exclude, collapse="-"))
+  if(length(exclude))
+    ex = paste("-rm-", ex, sep="")
+  dr = paste("../fig", ex, "/", sep="")
+  if(!file.exists(dr))
+    dir.create(dr)
+  return(dr)
+}
+
+exampleROCdf = function(upper = 1e-1, exclude = NULL){
   l = loopify(function(mtd, size, rep){
     .roc = readRDS(paste("../roc/", file.name(mtd, size, 1), sep=""))
     .roc = .roc[.roc$fpr <= upper,]
@@ -7,17 +17,21 @@ exampleROCdf = function(upper = 1e-1){
     .roc
   }, rep = 1)
 
-  data.frame(
+  d = data.frame(
     fpr = do.call("c", l$fpr),
     tpr = do.call("c", l$tpr),
     mtd = ordered(do.call("c", lapply(l$mtd, as.character)), levels = rev(work.parms("mtd"))),
     size = ordered(do.call("c", l$size), labels = paste(work.parms("size"), "samples / group"))
   )
+
+  for(e in exclude)
+    d = d[d$mtd != e,]
+  return(d)
 }
 
-plotExampleROC = function(upper = c(1e-1, 1)){ 
+plotExampleROC = function(upper = c(1e-1, 1), exclude = NULL){ 
   Vectorize(function(upper){
-    pl = ggplot(exampleROCdf(upper), aes(x = fpr, y = tpr)) +
+    pl = ggplot(exampleROCdf(upper, exclude), aes(x = fpr, y = tpr)) +
            facet_grid(~ size) + 
            geom_abline() +  
            geom_line(aes(color = mtd)) + 
@@ -31,14 +45,20 @@ plotExampleROC = function(upper = c(1e-1, 1)){
                       panel.grid.major = element_line(color="lightgray"),
                       text = element_text(family = "Helvetica", colour= "black"))
 
-    ggsave(paste("../fig/exampleROC", gsub("\\.", "_", as.character(upper)),
+   dr = figdir(exclude)
+
+    ggsave(paste(dr, "exampleROC", gsub("\\.", "_", as.character(upper)),
                  ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   }, "upper")(upper)
 }
 
-plotAUCfacet = function(facet.by.size = c(T, F)){
+plotAUCfacet = function(facet.by.size = c(T, F), exclude = NULL){
   Vectorize(function(facet.by.size){
     df = readRDS("../auc/auc.rds")
+
+    for(e in exclude)
+      df = df[df$mtd != e,]
+   dr = figdir(exclude)
 
     if(facet.by.size){
       pl = ggplot(df, aes(x = mtd, y = auc)) +
@@ -61,15 +81,19 @@ plotAUCfacet = function(facet.by.size = c(T, F)){
                       panel.grid.major = element_line(color="lightgray"),
                       text = element_text(family = "Helvetica", colour= "black"))
     
-    ggsave(paste("../fig/auc-facet-", facet.by.size, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+    ggsave(paste(dr, "auc-facet-", facet.by.size, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   }, "facet.by.size")(facet.by.size)
 }
 
-plotAUCcolor = function(jitter = c(T, F)){
+plotAUCcolor = function(jitter = c(T, F), exclude = NULL){
   Vectorize(function(jitter){
     df = readRDS("../auc/auc.rds")
     df$mtd = ordered(df$mtd, rev(work.parms("mtd")))
     
+    for(e in exclude)
+      df = df[df$mtd != e,]
+   dr = figdir(exclude)
+
     pl = ggplot(df, aes(x = size.short, y = auc, color = mtd), na.rm=TRUE) +
            geom_crossbar(aes(ymin = lower, y = mean, ymax = upper), fatten = 1, width = .25) + 
            labs(color = "Method") +
@@ -86,16 +110,20 @@ plotAUCcolor = function(jitter = c(T, F)){
     else
       pl = pl + geom_point()    
     
-    ggsave(paste("../fig/auc-color-", jitter, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+    ggsave(paste(dr, "auc-color-", jitter, ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   }, "jitter")(jitter)
 }
 
 plotFDRfacet = function(facet.direction = c(T, F), who = c("dan", "jarad"), y.axis = c("subtract", "leave"),
-reverse.x = c(" ", " no ")){
+reverse.x = c(" ", " no "), exclude = NULL){
   grid = expand.grid(who, facet.direction, y.axis, reverse.x)
   
   Vectorize(function(who, facet.direction, y.axis, reverse.x){
     d = readRDS(paste("../fdr/",who, ".rds", sep=""))
+
+    for(e in exclude)
+      d = d[d$mtd != e,]
+   dr = figdir(exclude)
   
     if(who == "dan") reverse.x = " no "
 
@@ -124,12 +152,15 @@ reverse.x = c(" ", " no ")){
      if(reverse.x == " ")
     pl = pl + scale_x_reverse()
 
-     ggsave(paste("../fig/fdr-facet-",who, "-", facet.direction, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+     ggsave(paste(dr, "fdr-facet-",who, "-", facet.direction, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   })(grid[[1]], grid[[2]], grid[[3]], grid[[4]])
 }
 
 plotFDRindiv = function(who = c("dan", "jarad"), mtd = work.parms("mtd"), y.axis = c("subtract", "leave"), 
-reverse.x = c(" ", " no ")){
+reverse.x = c(" ", " no "), exclude = NULL){
+
+  if(!is.null(exclude))
+    mtd = mtd[mtd != exclude]
   grid = expand.grid(who, mtd, y.axis, reverse.x)
   
   Vectorize(function(who, mtd, y.axis, reverse.x){
@@ -162,14 +193,16 @@ reverse.x = c(" ", " no ")){
     if(reverse.x == " ")
       pl = pl + scale_x_reverse()
 
-     ggsave(paste("../fig/fdr-indiv-",who, "-", mtd, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+   dr = figdir(exclude)
+
+     ggsave(paste(dr, "fdr-indiv-",who, "-", mtd, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   })(grid[[1]], grid[[2]], grid[[3]], grid[[4]])
 }
 
-makePlots = function(){
-  plotExampleROC()
-  plotAUCcolor()
-  plotAUCfacet()
-  plotFDRfacet()
-  plotFDRindiv()
+makePlots = function(exclude = NULL){
+  plotExampleROC(exclude = exclude)
+  plotAUCcolor(exclude = exclude)
+  plotAUCfacet(exclude = exclude)
+  plotFDRfacet(exclude = exclude)
+  plotFDRindiv(exclude = exclude)
 }
