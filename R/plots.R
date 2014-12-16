@@ -28,16 +28,16 @@ exampleROCdf = function(upper = 1e-1, exclude = NULL){
     .roc
   }, rep = 1)
 
-  d = relevel(data.frame(
+  d = data.frame(
     fpr = do.call("c", l$fpr),
     tpr = do.call("c", l$tpr),
     mtd = ordered(do.call("c", lapply(l$mtd, as.character)), levels = rev(work.parms("mtd"))),
     size = ordered(do.call("c", l$size), labels = paste(work.parms("size"), "samples / group"))
-  ))
+  )
 
   for(e in exclude)
     d = d[d$mtd != e,]
-  return(d)
+  return(relevel(d))
 }
 
 plotExampleROC = function(upper = c(1e-1, 1), exclude = NULL){ 
