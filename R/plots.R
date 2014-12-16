@@ -8,6 +8,17 @@ figdir = function(exclude = NULL){
   return(dr)
 }
 
+relevel = function(d){
+  if(!is.null(d$mtd)){
+    lvl = levels(d$mtd)
+    lvl[lvl == "stan"] = "RStan (ind)"
+    lvl[lvl == "stan_corr"] = "RStan (cov)"
+    lvl[lvl == "stan_laplace"] = "RStan (Laplace)"
+    levels(d$mtd) = lvl
+  }
+  return(d)
+}
+
 exampleROCdf = function(upper = 1e-1, exclude = NULL){
   l = loopify(function(mtd, size, rep){
     .roc = readRDS(paste("../roc/", file.name(mtd, size, 1), sep=""))
@@ -17,12 +28,12 @@ exampleROCdf = function(upper = 1e-1, exclude = NULL){
     .roc
   }, rep = 1)
 
-  d = data.frame(
+  d = relevel(data.frame(
     fpr = do.call("c", l$fpr),
     tpr = do.call("c", l$tpr),
     mtd = ordered(do.call("c", lapply(l$mtd, as.character)), levels = rev(work.parms("mtd"))),
     size = ordered(do.call("c", l$size), labels = paste(work.parms("size"), "samples / group"))
-  )
+  ))
 
   for(e in exclude)
     d = d[d$mtd != e,]
@@ -59,6 +70,7 @@ plotAUCfacet = function(facet.by.size = c(T, F), exclude = NULL){
     for(e in exclude)
       df = df[df$mtd != e,]
    dr = figdir(exclude)
+   df = relevel(df)
 
     if(facet.by.size){
       pl = ggplot(df, aes(x = mtd, y = auc)) +
@@ -93,6 +105,7 @@ plotAUCcolor = function(jitter = c(T, F), exclude = NULL){
     for(e in exclude)
       df = df[df$mtd != e,]
    dr = figdir(exclude)
+   df = relevel(df)
 
     pl = ggplot(df, aes(x = size.short, y = auc, color = mtd), na.rm=TRUE) +
            geom_crossbar(aes(ymin = lower, y = mean, ymax = upper), fatten = 1, width = .25) + 
@@ -124,6 +137,7 @@ reverse.x = c(" ", " no "), exclude = NULL){
     for(e in exclude)
       d = d[d$mtd != e,]
    dr = figdir(exclude)
+   d = relevel(d)
   
     if(who == "dan") reverse.x = " no "
 
@@ -152,7 +166,7 @@ reverse.x = c(" ", " no "), exclude = NULL){
      if(reverse.x == " ")
     pl = pl + scale_x_reverse()
 
-     ggsave(paste(dr, "fdr-facet-",who, "-", facet.direction, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+     ggsave(paste(dr, "fdr-facet-",who, "-", facet.direction, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 8, dpi = 1600)
   })(grid[[1]], grid[[2]], grid[[3]], grid[[4]])
 }
 
@@ -166,6 +180,7 @@ reverse.x = c(" ", " no "), exclude = NULL){
   Vectorize(function(who, mtd, y.axis, reverse.x){
     d = readRDS(paste("../fdr/",who, ".rds", sep=""))
     d = d[d$mtd == mtd,]
+    d = relevel(d)
 
     if(who == "dan") reverse.x = " no "
 
