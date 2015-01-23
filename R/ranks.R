@@ -153,6 +153,7 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
 
 print(group)
 print(head(counts))
+print(str(counts))
 
     mu.parent1 = as.integer(group == "parent1")
     mu.parent2 = as.integer(group == "parent2")
