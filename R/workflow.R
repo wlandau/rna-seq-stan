@@ -8,6 +8,7 @@ source("setup.R")
 
 unpack.stan()
 #ranks(mtds = "ShrinkBayes", reps = reps.on.server, ncpus = ncpus)
+ranks(mtds = "ShrinkBayes", reps = 2, ncpus = 1)
 rocs(mtd = c("stan_corr", "stan", "stan_laplace"))
 aucs()
 fdr()

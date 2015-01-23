@@ -78,21 +78,93 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
     ret = 1 - post
   } else if(mtd == "ShrinkBayes"){
 
-    phi = rep(1, length(group))
-    alp = (group == "parent2") - (group == "parent1")
-    del = as.integer(group == "hybrid")
+####################################
+### PHI ALP DEL PARAMETERIZATION ###
+####################################
+
+#    phi = rep(1, length(group))
+#    alp = (group == "parent2") - (group == "parent1")
+#    del = as.integer(group == "hybrid")
+
+#    size <- calcNormFactors(counts)
+#    libsize <- apply(counts, 2, sum)
+#    libsize <- libsize/exp(mean(log(libsize)))
+#    logsize <- log(size) + log(libsize)
+#    logsize <- logsize - mean(logsize)
+
+#    form = y ~ 0 + phi + alp + del + offset(logsize)
+#    lc = inla.make.lincombs(alp = c(1,1), del = c(1, -1), phi = c(0, 0))
+
+#    priors = ShrinkSeq(form = form, dat = counts, shrinkfixed = "phi", shrinkaddfixed = list("alp", "del"), fams = "nb", shrinkdisp = T, addfixedmeanzero = F, ncpus = ncpus, ntag = ceiling(dim(counts)[1]/2)) # high ntag
+
+    # finalprior = T to get rid of mixture prior
+    # ncpus doesn't work in FitAllShrink
+#    fit = FitAllShrink(forms = form, dat = counts, shrinksimul = priors, fams="nb", finalprior = T, lincomb = lc) 
+
+#    postsLc1 = BFUpdatePosterior(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
+#    postsLc2 = BFUpdatePosterior(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
+
+#    post1 = SummaryWrap(postsLc1, thr = 0, direction = "greater", ncpus = ncpus) # P(alp + del > 0) = P(del > -alp)
+#    post2 = SummaryWrap(postsLc2, thr = 0, direction = "lesser", ncpus = ncpus) # P(alp - del < 0) = P(del > alp)  
+#    post3 = SummaryWrap(postsLc2, thr = 0, direction = "greater", ncpus = ncpus) # P(alp - del > 0) = P(del < alp)
+#    post4 = SummaryWrap(postsLc1, thr = 0, direction = "lesser", ncpus = ncpus) # P(alp + del < 0) = P(del < -alp)
+
+#    postsAlp = BFUpdatePosterior(fit, priors, shrinkpara = "alp", ncpus = ncpus)
+#    postmeansAlp = SummaryWrap(postsAlp, summary="postmean", ncpus = ncpus)
+
+#    postsDel = BFUpdatePosterior(fit, priors, shrinkpara = "del", ncpus = ncpus)
+#    postmeansDel = SummaryWrap(postsDel, summary="postmean", ncpus = ncpus)
+
+#    df = cbind(postmeansAlp, postmeansDel, post1, post2, post3, post4)
+#    colnames(df) = c("alp", "del", paste("post", 1:4, sep=""))
+ 
+#    ret = 1 - apply(df, 1, function(x){
+#      if(abs(x["del"]) <= abs(x["alp"]))
+#        return(0)
+#    else if(x["del"] > -x["alp"]) # before 12/2/14
+#      else if(x["del"] > -x["alp"] && -x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
+#        return(x["post1"])
+#   else if(x["del"] > x["alp"] && x["alp"] >= 0) # before 12/2/14
+#     else if(x["del"] > x["alp"] && x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
+#        return(x["post2"])
+#    else if(x["del"] < x["alp"]) # before 12/2/14
+#      else if(x["del"] < x["alp"] && x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
+#        return(x["post3"])
+#    else if(x["del"] < -x["alp"]) # before 12/2/14
+#      else if(x["del"] < -x["alp"] && -x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
+#        return(x["post4"])    
+#    })
+#  }
+
+#  s = proc.time()
+#  logfile(paste(s - t, collapse = " "))
+#  return(ret)
+
+
+#####################################
+### CELL MEANS PARAMETERIZATION ###
+#####################################
+
+# ncpus = 2
+# mtd="ShrinkBayes"
+# group = rep(c("parent1", "parent2", "hybrid"), each = 4)
+# counts = readRDS("../simulations/sim-4-1.rds")[1:500,]
+# head(counts)
+
+    mu.parent1 = as.integer(group == "parent1")
+    mu.parent2 = as.integer(group == "parent2")
+    mu.hybrid = as.integer(group == "hybrid")
 
     size <- calcNormFactors(counts)
     libsize <- apply(counts, 2, sum)
     libsize <- libsize/exp(mean(log(libsize)))
     logsize <- log(size) + log(libsize)
     logsize <- logsize - mean(logsize)
-    lgsz = offset(logsize)
 
-    form = y ~ 0 + phi + alp + del + lgsz
-    lc = inla.make.lincombs(alp = c(1,1), del = c(1, -1), phi = c(0, 0))
+    form = y ~ 0 + mu.parent1 + mu.parent2 + mu.hybrid + offset(logsize)
+    lc = inla.make.lincombs(mu.parent1 = c(1,0), mu.parent2 = c(0, 1), mu.hybrid = c(-1, -1))
 
-    priors = ShrinkSeq(form = form, dat = counts, shrinkfixed = "phi", shrinkaddfixed = list("alp", "del"), fams = "nb", shrinkdisp = T, addfixedmeanzero = F, ncpus = ncpus, ntag = ceiling(dim(counts)[1]/2)) # high ntag
+    priors = ShrinkSeq(form = form, dat = counts, shrinkfixed = "mu.hybrid", shrinkaddfixed = list("mu.parent1", "mu.parent2"), fams = "nb", shrinkdisp = T, addfixedmeanzero = F, ncpus = ncpus, ntag = ceiling(dim(counts)[1]/2)) # high ntag
 
     # finalprior = T to get rid of mixture prior
     # ncpus doesn't work in FitAllShrink
@@ -101,35 +173,34 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
     postsLc1 = BFUpdatePosterior(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
     postsLc2 = BFUpdatePosterior(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
 
-    post1 = SummaryWrap(postsLc1, thr = 0, direction = "greater", ncpus = ncpus) # P(alp + del > 0) = P(del > -alp)
-    post2 = SummaryWrap(postsLc2, thr = 0, direction = "lesser", ncpus = ncpus) # P(alp - del < 0) = P(del > alp)  
-    post3 = SummaryWrap(postsLc2, thr = 0, direction = "greater", ncpus = ncpus) # P(alp - del > 0) = P(del < alp)
-    post4 = SummaryWrap(postsLc1, thr = 0, direction = "lesser", ncpus = ncpus) # P(alp + del < 0) = P(del < -alp)
+    p1.g.h = SummaryWrap(postsLc1, thr = 0, direction = "greater", ncpus = ncpus) # P(mu.parent1 - mu.hybrid > 0) = P(mu.parent1 > mu.hybrid)
+    h.g.p2 = SummaryWrap(postsLc2, thr = 0, direction = "lesser", ncpus = ncpus) # P(mu.parent2 - mu.hybrid < 0) = P(mu.hybrid > mu.parent2)  
+    p2.g.h = SummaryWrap(postsLc2, thr = 0, direction = "greater", ncpus = ncpus) # P(mu.parent2 - mu.hybrid > 0) = P(mu.parent2 > mu.hybrid)
+    h.g.p1 = SummaryWrap(postsLc1, thr = 0, direction = "lesser", ncpus = ncpus) # P(mu.parent1 - mu.hybrid  < 0) = P(mu.hybrid > mu.parent1)
 
-    postsAlp = BFUpdatePosterior(fit, priors, shrinkpara = "alp", ncpus = ncpus)
-    postmeansAlp = SummaryWrap(postsAlp, summary="postmean", ncpus = ncpus)
+  posts.mu.parent1 = BFUpdatePosterior(fit, priors, shrinkpara = "mu.parent1", ncpus = ncpus)
+  postmeans.mu.parent1 = SummaryWrap(posts.mu.parent1, summary="postmean", ncpus = ncpus)
 
-    postsDel = BFUpdatePosterior(fit, priors, shrinkpara = "del", ncpus = ncpus)
-    postmeansDel = SummaryWrap(postsDel, summary="postmean", ncpus = ncpus)
+  posts.mu.parent2 = BFUpdatePosterior(fit, priors, shrinkpara = "mu.parent2", ncpus = ncpus)
+  postmeans.mu.parent2 = SummaryWrap(posts.mu.parent2, summary="postmean", ncpus = ncpus)
+ 
+  posts.mu.hybrid = BFUpdatePosterior(fit, priors, shrinkpara = "mu.hybrid", ncpus = ncpus)
+  postmeans.mu.hybrid = SummaryWrap(posts.mu.hybrid, summary="postmean", ncpus = ncpus)
 
-    df = cbind(postmeansAlp, postmeansDel, post1, post2, post3, post4)
-    colnames(df) = c("alp", "del", paste("post", 1:4, sep=""))
+df = cbind(postmeans.mu.parent1, postmeans.mu.parent2, postmeans.mu.hybrid, p1.g.h, p2.g.h, h.g.p1, h.g.p2)
+colnames(df) = c("p1", "p2", "h", "p1.g.h", "p2.g.h", "h.g.p1", "h.g.p2")
  
     ret = 1 - apply(df, 1, function(x){
-      if(abs(x["del"]) <= abs(x["alp"]))
+      if((min(x["p1"], x["p2"]) <= x["h"]) && (x["h"] <= max(x["p1"], x["p2"])))
         return(0)
-#    else if(x["del"] > -x["alp"]) # before 12/2/14
-      else if(x["del"] > -x["alp"] && -x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
-        return(x["post1"])
-#   else if(x["del"] > x["alp"] && x["alp"] >= 0) # before 12/2/14
-     else if(x["del"] > x["alp"] && x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
-        return(x["post2"])
-#    else if(x["del"] < x["alp"]) # before 12/2/14
-      else if(x["del"] < x["alp"] && x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
-        return(x["post3"])
-#    else if(x["del"] < -x["alp"]) # before 12/2/14
-      else if(x["del"] < -x["alp"] && -x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
-        return(x["post4"])    
+      else if(x["h"] > x["p1"] && (x["p1"] >= x["p2"]))
+        return(x["h.g.p1"])
+      else if(x["h"] > x["p2"] && (x["p2"] >= x["p1"]))
+        return(x["h.g.p2"])
+      else if(x["h"] < x["p1"] && (x["p1"] <= x["p2"]))
+        return(x["p1.g.h"])
+      else if(x["h"] < x["p2"] && (x["p2"] <= x["p1"]))
+        return(x["p2.g.h"])
     })
   }
 
