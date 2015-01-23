@@ -155,6 +155,10 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
     mu.parent2 = as.integer(group == "parent2")
     mu.hybrid = as.integer(group == "hybrid")
 
+print(mu.parent1)
+print(mu.parent2)
+print(mu.hybrid)
+
     size <- calcNormFactors(counts)
     libsize <- apply(counts, 2, sum)
     libsize <- libsize/exp(mean(log(libsize)))
@@ -164,19 +168,33 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
     form = y ~ 0 + mu.parent1 + mu.parent2 + mu.hybrid + offset(logsize)
     lc = inla.make.lincombs(mu.parent1 = c(1,0), mu.parent2 = c(0, 1), mu.hybrid = c(-1, -1))
 
+print(form)
+print(lc)
+
+print("priors")
+
     priors = ShrinkSeq(form = form, dat = counts, shrinkfixed = "mu.hybrid", shrinkaddfixed = list("mu.parent1", "mu.parent2"), fams = "nb", shrinkdisp = T, addfixedmeanzero = F, ncpus = ncpus, ntag = ceiling(dim(counts)[1]/2)) # high ntag
+
+
+print("fitallshrink")
 
     # finalprior = T to get rid of mixture prior
     # ncpus doesn't work in FitAllShrink
     fit = FitAllShrink(forms = form, dat = counts, shrinksimul = priors, fams="nb", finalprior = T, lincomb = lc) 
 
+print("bfupdateposterior")
+
     postsLc1 = BFUpdatePosterior(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
     postsLc2 = BFUpdatePosterior(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
+
+print("summarywrap")
 
     p1.g.h = SummaryWrap(postsLc1, thr = 0, direction = "greater", ncpus = ncpus) # P(mu.parent1 - mu.hybrid > 0) = P(mu.parent1 > mu.hybrid)
     h.g.p2 = SummaryWrap(postsLc2, thr = 0, direction = "lesser", ncpus = ncpus) # P(mu.parent2 - mu.hybrid < 0) = P(mu.hybrid > mu.parent2)  
     p2.g.h = SummaryWrap(postsLc2, thr = 0, direction = "greater", ncpus = ncpus) # P(mu.parent2 - mu.hybrid > 0) = P(mu.parent2 > mu.hybrid)
     h.g.p1 = SummaryWrap(postsLc1, thr = 0, direction = "lesser", ncpus = ncpus) # P(mu.parent1 - mu.hybrid  < 0) = P(mu.hybrid > mu.parent1)
+
+print("bfupdateposterior")
 
   posts.mu.parent1 = BFUpdatePosterior(fit, priors, shrinkpara = "mu.parent1", ncpus = ncpus)
   postmeans.mu.parent1 = SummaryWrap(posts.mu.parent1, summary="postmean", ncpus = ncpus)
