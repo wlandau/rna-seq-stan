@@ -151,6 +151,9 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
 # counts = readRDS("../simulations/sim-4-1.rds")[1:500,]
 # head(counts)
 
+print(group)
+print(head(counts))
+
     mu.parent1 = as.integer(group == "parent1")
     mu.parent2 = as.integer(group == "parent2")
     mu.hybrid = as.integer(group == "hybrid")
