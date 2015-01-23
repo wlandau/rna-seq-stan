@@ -21,7 +21,7 @@ edgeR.ord = function(fit){
 
 ranks1dataset = function(mtd, counts, group, ncpus = 2){
  
-counts = counts[100,]
+counts = counts[1:100,]
 
   t = proc.time()
 
