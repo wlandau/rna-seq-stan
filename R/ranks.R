@@ -153,15 +153,15 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
 
 print(group)
 print(head(counts))
-print(str(counts))
+str(str(counts))
 
     mu.parent1 = as.integer(group == "parent1")
     mu.parent2 = as.integer(group == "parent2")
     mu.hybrid = as.integer(group == "hybrid")
 
-print(mu.parent1)
-print(mu.parent2)
-print(mu.hybrid)
+str(mu.parent1)
+str(mu.parent2)
+str(mu.hybrid)
 
     size <- calcNormFactors(counts)
     libsize <- apply(counts, 2, sum)
