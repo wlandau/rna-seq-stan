@@ -80,78 +80,64 @@ counts = counts[1:100,]
     ret = 1 - post
   } else if(mtd == "ShrinkBayes"){
 
-####################################
-### PHI ALP DEL PARAMETERIZATION ###
-####################################
+    phi = rep(1, length(group))
+    alp = (group == "parent2") - (group == "parent1")
+    del = as.integer(group == "hybrid")
 
-#    phi = rep(1, length(group))
-#    alp = (group == "parent2") - (group == "parent1")
-#    del = as.integer(group == "hybrid")
+    size <- calcNormFactors(counts)
+    libsize <- apply(counts, 2, sum)
+    libsize <- libsize/exp(mean(log(libsize)))
+    logsize <- log(size) + log(libsize)
+    logsize <- logsize - mean(logsize)
+    logsize <<- logsize
 
-#    size <- calcNormFactors(counts)
-#    libsize <- apply(counts, 2, sum)
-#    libsize <- libsize/exp(mean(log(libsize)))
-#    logsize <- log(size) + log(libsize)
-#    logsize <- logsize - mean(logsize)
+    form = y ~ 0 + phi + alp + del + offset(logsize)
+    lc = inla.make.lincombs(alp = c(1,1), del = c(1, -1), phi = c(0, 0))
 
-#    form = y ~ 0 + phi + alp + del + offset(logsize)
-#    lc = inla.make.lincombs(alp = c(1,1), del = c(1, -1), phi = c(0, 0))
-
-#    priors = ShrinkSeq(form = form, dat = counts, shrinkfixed = "phi", shrinkaddfixed = list("alp", "del"), fams = "nb", shrinkdisp = T, addfixedmeanzero = F, ncpus = ncpus, ntag = ceiling(dim(counts)[1]/2)) # high ntag
+    priors = ShrinkSeq(form = form, dat = counts, shrinkfixed = "phi", shrinkaddfixed = list("alp", "del"), fams = "nb", shrinkdisp = T, addfixedmeanzero = F, ncpus = ncpus, ntag = ceiling(dim(counts)[1]/2)) # high ntag
 
     # finalprior = T to get rid of mixture prior
     # ncpus doesn't work in FitAllShrink
-#    fit = FitAllShrink(forms = form, dat = counts, shrinksimul = priors, fams="nb", finalprior = T, lincomb = lc) 
+    fit = FitAllShrink(forms = form, dat = counts, shrinksimul = priors, fams="nb", finalprior = T, lincomb = lc) 
 
-#    postsLc1 = BFUpdatePosterior(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
-#    postsLc2 = BFUpdatePosterior(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
+    postsLc1 = BFUpdatePosterior(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
+    postsLc2 = BFUpdatePosterior(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
 
-#    post1 = SummaryWrap(postsLc1, thr = 0, direction = "greater", ncpus = ncpus) # P(alp + del > 0) = P(del > -alp)
-#    post2 = SummaryWrap(postsLc2, thr = 0, direction = "lesser", ncpus = ncpus) # P(alp - del < 0) = P(del > alp)  
-#    post3 = SummaryWrap(postsLc2, thr = 0, direction = "greater", ncpus = ncpus) # P(alp - del > 0) = P(del < alp)
-#    post4 = SummaryWrap(postsLc1, thr = 0, direction = "lesser", ncpus = ncpus) # P(alp + del < 0) = P(del < -alp)
+    post1 = SummaryWrap(postsLc1, thr = 0, direction = "greater", ncpus = ncpus) # P(alp + del > 0) = P(del > -alp)
+    post2 = SummaryWrap(postsLc2, thr = 0, direction = "lesser", ncpus = ncpus) # P(alp - del < 0) = P(del > alp)  
+    post3 = SummaryWrap(postsLc2, thr = 0, direction = "greater", ncpus = ncpus) # P(alp - del > 0) = P(del < alp)
+    post4 = SummaryWrap(postsLc1, thr = 0, direction = "lesser", ncpus = ncpus) # P(alp + del < 0) = P(del < -alp)
 
-#    postsAlp = BFUpdatePosterior(fit, priors, shrinkpara = "alp", ncpus = ncpus)
-#    postmeansAlp = SummaryWrap(postsAlp, summary="postmean", ncpus = ncpus)
+    postsAlp = BFUpdatePosterior(fit, priors, shrinkpara = "alp", ncpus = ncpus)
+    postmeansAlp = SummaryWrap(postsAlp, summary="postmean", ncpus = ncpus)
 
-#    postsDel = BFUpdatePosterior(fit, priors, shrinkpara = "del", ncpus = ncpus)
-#    postmeansDel = SummaryWrap(postsDel, summary="postmean", ncpus = ncpus)
+    postsDel = BFUpdatePosterior(fit, priors, shrinkpara = "del", ncpus = ncpus)
+    postmeansDel = SummaryWrap(postsDel, summary="postmean", ncpus = ncpus)
 
-#    df = cbind(postmeansAlp, postmeansDel, post1, post2, post3, post4)
-#    colnames(df) = c("alp", "del", paste("post", 1:4, sep=""))
+    df = cbind(postmeansAlp, postmeansDel, post1, post2, post3, post4)
+    colnames(df) = c("alp", "del", paste("post", 1:4, sep=""))
  
-#    ret = 1 - apply(df, 1, function(x){
-#      if(abs(x["del"]) <= abs(x["alp"]))
-#        return(0)
-#    else if(x["del"] > -x["alp"]) # before 12/2/14
-#      else if(x["del"] > -x["alp"] && -x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
-#        return(x["post1"])
-#   else if(x["del"] > x["alp"] && x["alp"] >= 0) # before 12/2/14
-#     else if(x["del"] > x["alp"] && x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
-#        return(x["post2"])
-#    else if(x["del"] < x["alp"]) # before 12/2/14
-#      else if(x["del"] < x["alp"] && x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
-#        return(x["post3"])
-#    else if(x["del"] < -x["alp"]) # before 12/2/14
-#      else if(x["del"] < -x["alp"] && -x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
-#        return(x["post4"])    
-#    })
-#  }
-
-#  s = proc.time()
-#  logfile(paste(s - t, collapse = " "))
-#  return(ret)
-
+    ret = 1 - apply(df, 1, function(x){
+      if(abs(x["del"]) <= abs(x["alp"]))
+        return(0)
+    else if(x["del"] > -x["alp"]) # before 12/2/14
+      else if(x["del"] > -x["alp"] && -x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
+        return(x["post1"])
+   else if(x["del"] > x["alp"] && x["alp"] >= 0) # before 12/2/14
+     else if(x["del"] > x["alp"] && x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
+        return(x["post2"])
+    else if(x["del"] < x["alp"]) # before 12/2/14
+      else if(x["del"] < x["alp"] && x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
+        return(x["post3"])
+    else if(x["del"] < -x["alp"]) # before 12/2/14
+      else if(x["del"] < -x["alp"] && -x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
+        return(x["post4"])    
+    })
+  } else if(mtd == "ShrinkBayesMu") {
 
 #####################################
 ### CELL MEANS PARAMETERIZATION ###
 #####################################
-
-# ncpus = 2
-# mtd="ShrinkBayes"
-# group = rep(c("parent1", "parent2", "hybrid"), each = 4)
-# counts = readRDS("../simulations/sim-4-1.rds")[1:100,]
-# head(counts)
 
 print(group)
 print(head(counts))
@@ -170,6 +156,7 @@ str(mu.hybrid)
     libsize <- libsize/exp(mean(log(libsize)))
     logsize <- log(size) + log(libsize)
     logsize <- logsize - mean(logsize)
+    logsize <<- logsize
 
     form = y ~ 0 + mu.parent1 + mu.parent2 + mu.hybrid + offset(logsize)
     lc = inla.make.lincombs(mu.parent1 = c(1,0), mu.parent2 = c(0, 1), mu.hybrid = c(-1, -1))
@@ -190,8 +177,11 @@ print("fitallshrink")
 
 print("bfupdateposterior")
 
-    postsLc1 = BFUpdatePosterior(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
-    postsLc2 = BFUpdatePosterior(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
+#    postsLc1 = BFUpdatePosterior(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
+#    postsLc2 = BFUpdatePosterior(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
+
+    postsLc1 = andyspost(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
+    postsLc2 = andyspost(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
 
 print("summarywrap")
 
@@ -202,13 +192,16 @@ print("summarywrap")
 
 print("bfupdateposterior")
 
-  posts.mu.parent1 = BFUpdatePosterior(fit, priors, shrinkpara = "mu.parent1", ncpus = ncpus)
+#  posts.mu.parent1 = BFUpdatePosterior(fit, priors, shrinkpara = "mu.parent1", ncpus = ncpus)
+  posts.mu.parent1 = andyspost(fit, priors, shrinkpara = "mu.parent1", ncpus = ncpus)
   postmeans.mu.parent1 = SummaryWrap(posts.mu.parent1, summary="postmean", ncpus = ncpus)
 
-  posts.mu.parent2 = BFUpdatePosterior(fit, priors, shrinkpara = "mu.parent2", ncpus = ncpus)
+#  posts.mu.parent2 = BFUpdatePosterior(fit, priors, shrinkpara = "mu.parent2", ncpus = ncpus)
+  posts.mu.parent2 = andyspost(fit, priors, shrinkpara = "mu.parent2", ncpus = ncpus)
   postmeans.mu.parent2 = SummaryWrap(posts.mu.parent2, summary="postmean", ncpus = ncpus)
  
-  posts.mu.hybrid = BFUpdatePosterior(fit, priors, shrinkpara = "mu.hybrid", ncpus = ncpus)
+#  posts.mu.hybrid = BFUpdatePosterior(fit, priors, shrinkpara = "mu.hybrid", ncpus = ncpus)
+  posts.mu.hybrid = andyspost(fit, priors, shrinkpara = "mu.hybrid", ncpus = ncpus)
   postmeans.mu.hybrid = SummaryWrap(posts.mu.hybrid, summary="postmean", ncpus = ncpus)
 
 df = cbind(postmeans.mu.parent1, postmeans.mu.parent2, postmeans.mu.hybrid, p1.g.h, p2.g.h, h.g.p1, h.g.p2)
