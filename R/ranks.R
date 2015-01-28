@@ -120,16 +120,16 @@ counts = counts[1:100,]
     ret = 1 - apply(df, 1, function(x){
       if(abs(x["del"]) <= abs(x["alp"]))
         return(0)
-    else if(x["del"] > -x["alp"]) # before 12/2/14
+#    else if(x["del"] > -x["alp"]) # before 12/2/14
       else if(x["del"] > -x["alp"] && -x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
         return(x["post1"])
-   else if(x["del"] > x["alp"] && x["alp"] >= 0) # before 12/2/14
+#   else if(x["del"] > x["alp"] && x["alp"] >= 0) # before 12/2/14
      else if(x["del"] > x["alp"] && x["alp"] >= 0) # 12/2/14: changed in preparation for next round of simulations
         return(x["post2"])
-    else if(x["del"] < x["alp"]) # before 12/2/14
+#    else if(x["del"] < x["alp"]) # before 12/2/14
       else if(x["del"] < x["alp"] && x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
         return(x["post3"])
-    else if(x["del"] < -x["alp"]) # before 12/2/14
+#    else if(x["del"] < -x["alp"]) # before 12/2/14
       else if(x["del"] < -x["alp"] && -x["alp"] <= 0) # 12/2/14: changed in preparation for next round of simulations
         return(x["post4"])    
     })
