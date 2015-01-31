@@ -1,3 +1,7 @@
+trim.whitespace = function(x){
+  gsub("^\\s+|\\s+$", "", x)
+}
+
 figdir = function(mtd = work.parms("mtd")){
   m = paste(paste(mtd, collapse="-"))
   if(length(mtd))
@@ -128,8 +132,8 @@ reverse.x = c(" ", " no "), mtd = work.parms("mtd")){
   grid = expand.grid(who, facet.direction, y.axis, reverse.x)
   
   Vectorize(function(who, facet.direction, y.axis, reverse.x){
-    df = readRDS(paste("../fdr/",who, ".rds", sep=""))
-    df = df[df$mtd %in% mtd, ]
+    d = readRDS(paste("../fdr/",who, ".rds", sep=""))
+    d = d[d$mtd %in% mtd, ]
 
    dr = figdir(mtd)
    d = relevel(d)
@@ -161,7 +165,7 @@ reverse.x = c(" ", " no "), mtd = work.parms("mtd")){
      if(reverse.x == " ")
     pl = pl + scale_x_reverse()
 
-     ggsave(paste(dr, "fdr-facet-",who, "-", facet.direction, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 8, dpi = 1600)
+     ggsave(paste(dr, "fdr-facet-",who, "-", facet.direction, "-", y.axis, "-", trim.whitespace(reverse.x), ".pdf", sep=""), pl, width = 8, height = 8, dpi = 1600)
   })(grid[[1]], grid[[2]], grid[[3]], grid[[4]])
 }
 
@@ -203,7 +207,7 @@ reverse.x = c(" ", " no ")){
 
    dr = figdir(mtd)
 
-     ggsave(paste(dr, "fdr-indiv-",who, "-", mtd, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
+     ggsave(paste(dr, "fdr-indiv-",who, "-", mtd, "-", y.axis, "-", trim.whitespace(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   })(grid[[1]], grid[[2]], grid[[3]], grid[[4]])
 }
 
