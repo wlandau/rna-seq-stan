@@ -1,8 +1,8 @@
-figdir = function(exclude = NULL){
-  ex = paste(paste(exclude, collapse="-"))
-  if(length(exclude))
-    ex = paste("-rm-", ex, sep="")
-  dr = paste("../fig", ex, "/", sep="")
+figdir = function(mtd = work.parms("mtd")){
+  m = paste(paste(mtd, collapse="-"))
+  if(length(mtd))
+    m = paste("-", m, sep="")
+  dr = paste("../fig", m, "/", sep="")
   if(!file.exists(dr))
     dir.create(dr)
   return(dr)
@@ -19,7 +19,7 @@ relevel = function(d){
   return(d)
 }
 
-exampleROCdf = function(upper = 1e-1, exclude = NULL){
+exampleROCdf = function(upper = 1e-1, mtd = work.parms("mtd")){
   l = loopify(function(mtd, size, rep){
     .roc = readRDS(paste("../roc/", file.name(mtd, size, 1), sep=""))
     .roc = .roc[.roc$fpr <= upper,]
@@ -35,14 +35,12 @@ exampleROCdf = function(upper = 1e-1, exclude = NULL){
     size = ordered(do.call("c", l$size), labels = paste(work.parms("size"), "samples / group"))
   )
 
-  for(e in exclude)
-    d = d[d$mtd != e,]
   return(relevel(d))
 }
 
-plotExampleROC = function(upper = c(1e-1, 1), exclude = NULL){ 
+plotExampleROC = function(upper = c(1e-1, 1), mtd = work.parms("mtd")){ 
   Vectorize(function(upper){
-    pl = ggplot(exampleROCdf(upper, exclude), aes(x = fpr, y = tpr)) +
+    pl = ggplot(exampleROCdf(upper, mtd), aes(x = fpr, y = tpr)) +
            facet_grid(~ size) + 
            geom_abline() +  
            geom_line(aes(color = mtd)) + 
@@ -56,20 +54,19 @@ plotExampleROC = function(upper = c(1e-1, 1), exclude = NULL){
                       panel.grid.major = element_line(color="lightgray"),
                       text = element_text(family = "Helvetica", colour= "black"))
 
-   dr = figdir(exclude)
+    dr = figdir(mtd)
 
     ggsave(paste(dr, "exampleROC", gsub("\\.", "_", as.character(upper)),
                  ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   }, "upper")(upper)
 }
 
-plotAUCfacet = function(facet.by.size = c(T, F), exclude = NULL){
+plotAUCfacet = function(facet.by.size = c(T, F), mtd = work.parms("mtd")){
   Vectorize(function(facet.by.size){
     df = readRDS("../auc/auc.rds")
+    df = df[df$mtd %in% mtd, ]
 
-    for(e in exclude)
-      df = df[df$mtd != e,]
-   dr = figdir(exclude)
+   dr = figdir(mtd)
    df = relevel(df)
 
     if(facet.by.size){
@@ -97,14 +94,13 @@ plotAUCfacet = function(facet.by.size = c(T, F), exclude = NULL){
   }, "facet.by.size")(facet.by.size)
 }
 
-plotAUCcolor = function(jitter = c(T, F), exclude = NULL){
+plotAUCcolor = function(jitter = c(T, F), mtd = work.parms("mtd")){
   Vectorize(function(jitter){
     df = readRDS("../auc/auc.rds")
-    df$mtd = ordered(df$mtd, rev(work.parms("mtd")))
-    
-    for(e in exclude)
-      df = df[df$mtd != e,]
-   dr = figdir(exclude)
+    df = df[df$mtd %in% mtd, ]
+    df$mtd = ordered(df$mtd, rev(mtd))
+
+   dr = figdir(mtd)
    df = relevel(df)
 
     pl = ggplot(df, aes(x = size.short, y = auc, color = mtd), na.rm=TRUE) +
@@ -128,15 +124,14 @@ plotAUCcolor = function(jitter = c(T, F), exclude = NULL){
 }
 
 plotFDRfacet = function(facet.direction = c(T, F), who = c("dan", "jarad"), y.axis = c("subtract", "leave"),
-reverse.x = c(" ", " no "), exclude = NULL){
+reverse.x = c(" ", " no "), mtd = work.parms("mtd")){
   grid = expand.grid(who, facet.direction, y.axis, reverse.x)
   
   Vectorize(function(who, facet.direction, y.axis, reverse.x){
-    d = readRDS(paste("../fdr/",who, ".rds", sep=""))
+    df = readRDS(paste("../fdr/",who, ".rds", sep=""))
+    df = df[df$mtd %in% mtd, ]
 
-    for(e in exclude)
-      d = d[d$mtd != e,]
-   dr = figdir(exclude)
+   dr = figdir(mtd)
    d = relevel(d)
   
     if(who == "dan") reverse.x = " no "
@@ -171,10 +166,8 @@ reverse.x = c(" ", " no "), exclude = NULL){
 }
 
 plotFDRindiv = function(who = c("dan", "jarad"), mtd = work.parms("mtd"), y.axis = c("subtract", "leave"), 
-reverse.x = c(" ", " no "), exclude = NULL){
+reverse.x = c(" ", " no ")){
 
-  if(!is.null(exclude))
-    mtd = mtd[mtd != exclude]
   grid = expand.grid(who, mtd, y.axis, reverse.x)
   
   Vectorize(function(who, mtd, y.axis, reverse.x){
@@ -208,16 +201,16 @@ reverse.x = c(" ", " no "), exclude = NULL){
     if(reverse.x == " ")
       pl = pl + scale_x_reverse()
 
-   dr = figdir(exclude)
+   dr = figdir(mtd)
 
      ggsave(paste(dr, "fdr-indiv-",who, "-", mtd, "-", y.axis, "-", trim(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   })(grid[[1]], grid[[2]], grid[[3]], grid[[4]])
 }
 
-makePlots = function(exclude = NULL){
-  plotExampleROC(exclude = exclude)
-  plotAUCcolor(exclude = exclude)
-  plotAUCfacet(exclude = exclude)
-  plotFDRfacet(exclude = exclude)
-  plotFDRindiv(exclude = exclude)
+makePlots = function(mtd = work.parms("mtd")){
+  plotExampleROC(mtd = mtd)
+  plotAUCcolor(mtd = mtd)
+  plotAUCfacet(mtd = mtd)
+  plotFDRfacet(mtd = mtd)
+  plotFDRindiv(mtd = mtd)
 }
