@@ -173,7 +173,8 @@ plotFDRindiv = function(who = c("dan", "jarad"), mtd = work.parms("mtd"), y.axis
 reverse.x = c(" ", " no ")){
 
   grid = expand.grid(who, mtd, y.axis, reverse.x)
-  
+   dr = figdir(mtd)  
+
   Vectorize(function(who, mtd, y.axis, reverse.x){
     d = readRDS(paste("../fdr/",who, ".rds", sep=""))
     d = d[d$mtd == mtd,]
@@ -204,8 +205,6 @@ reverse.x = c(" ", " no ")){
 
     if(reverse.x == " ")
       pl = pl + scale_x_reverse()
-
-   dr = figdir(mtd)
 
      ggsave(paste(dr, "fdr-indiv-",who, "-", mtd, "-", y.axis, "-", trim.whitespace(reverse.x), ".pdf", sep=""), pl, width = 8, height = 5, dpi = 1600)
   })(grid[[1]], grid[[2]], grid[[3]], grid[[4]])
