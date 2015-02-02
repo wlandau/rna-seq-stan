@@ -18,7 +18,8 @@ relevel = function(d){
     lvl[lvl == "stan"] = "RStan (ind)"
     lvl[lvl == "stan_corr"] = "RStan (cov)"
     lvl[lvl == "stan_laplace"] = "RStan (Laplace)"
-    levels(d$mtd) = lvl
+    lvl[lvl == "stan_laplace_mvn"] = "RStan (Laplace MVN)"
+    levels(d$mtd) = lvl   
   }
   return(d)
 }
@@ -69,6 +70,7 @@ plotAUCfacet = function(facet.by.size = c(T, F), mtd = work.parms("mtd")){
   Vectorize(function(facet.by.size){
     df = readRDS("../auc/auc.rds")
     df = df[df$mtd %in% mtd, ]
+    df$mtd = ordered(df$mtd, work.parms("mtd"))
 
    dr = figdir(mtd)
    df = relevel(df)

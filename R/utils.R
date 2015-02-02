@@ -1,5 +1,5 @@
 work.parms = function(item){
-  mtd = c("edgeR", "baySeq", "stan_corr", "ShrinkBayes", "ShrinkBayesMu", "stan", "stan_laplace")
+  mtd = c("edgeR", "baySeq", "stan_corr", "ShrinkBayes", "stan", "stan_laplace", "stan_laplace_mvn", "ShrinkBayesMu")
   switch(item, 
              "mtd" = ordered(mtd, levels = mtd),
              "size" = c(4, 8, 16),
@@ -17,8 +17,8 @@ loopify = function(fun, mtd = work.parms("mtd"), size = work.parms("size"), rep 
   as.data.frame(t(Vectorize(fun, c("mtd", "size", "rep"))(.grid$mtd, .grid$size, .grid$rep)))
 }
 
-unpack.stan = function(mtds = c("stan_corr", "stan", "stan_laplace")){
-  for(mtd in mtds){
+unpack.stan = function(mtds = c("stan_corr", "stan", "stan_laplace", "stan_laplace_mvn")){
+  for(mtd in intersect(mtds, c("stan_corr", "stan", "stan_laplace"))){
     file = switch(mtd,
                         "stan_corr" = "../ranks/stan_probs_corr.rds",
                         "stan" = "../ranks/stan_probs.rds",
@@ -34,5 +34,17 @@ unpack.stan = function(mtds = c("stan_corr", "stan", "stan_laplace")){
       names(probs) = x$geneid
       saveRDS(probs, paste("../ranks/", file.name(mtd, x$sample.size[1], x$sim[1]), sep=""))
     })
+  }
+
+  if(mtd == "stan_laplace_mvn"){
+    file.begin = "../laplace_mvn_posterior_probs/pprob_lap_mvn"
+    for(size in work.parms("size")){
+      for(rep in work.parms("rep")){
+        x = readRDS(paste(file.begin, size, "-", rep, sep=""))
+#       probs = 1 - pmax(x$phph, x$plph)
+        probs = 1 - (x$phph + x$plph)
+        saveRDS(probs, paste("../ranks/", file.name("stan_laplace_mvn", size, rep), sep=""))
+      }
+    }
   }
 }

@@ -19,7 +19,7 @@ edgeR.ord = function(fit){
   })
 }
 
-ranks1dataset = function(mtd, counts, group, ncpus = 2){
+ranks1dataset = function(mtd, size, rep, counts, group, ncpus = 2){
  
 # counts = counts[1:100,]
 
@@ -96,6 +96,8 @@ ranks1dataset = function(mtd, counts, group, ncpus = 2){
 
     priors = ShrinkSeq(form = form, dat = counts, shrinkfixed = "phi", shrinkaddfixed = list("alp", "del"), fams = "nb", shrinkdisp = T, addfixedmeanzero = F, ncpus = ncpus, ntag = ceiling(dim(counts)[1]/2)) # high ntag
 
+   saveRDS(priors, paste("../priors/", "ShrinkBayes-", size, "-", rep, ".rds", sep=""))
+
     # finalprior = T to get rid of mixture prior
     # ncpus doesn't work in FitAllShrink
     fit = FitAllShrink(forms = form, dat = counts, shrinksimul = priors, fams="nb", finalprior = T, lincomb = lc) 
@@ -168,6 +170,7 @@ print("priors")
 
     priors = ShrinkSeq(form = form, dat = counts, shrinkfixed = "mu.hybrid", shrinkaddfixed = list("mu.parent1", "mu.parent2"), fams = "nb", shrinkdisp = T, addfixedmeanzero = F, ncpus = ncpus, ntag = ceiling(dim(counts)[1]/2)) # high ntag
 
+   saveRDS(priors, paste("../priors/", "ShrinkBayesMu-", size, "-", rep, ".rds", sep=""))
 
 print("fitallshrink")
 
@@ -238,7 +241,7 @@ ranks = function(mtds = c("edgeR", "baySeq", "ShrinkBayes"), sizes = c(4, 8, 16)
         print(paste(size, rep))
 
         cts = readRDS(paste("../simulations/", file.name("sim", size, rep), sep=""))
-        saveRDS(ranks1dataset(mtd, cts, group, ncpus = ncpus), paste("../ranks/", file.name(mtd, size, rep), sep=""))
+        saveRDS(ranks1dataset(mtd, size, rep, cts, group, ncpus = ncpus), paste("../ranks/", file.name(mtd, size, rep), sep=""))
       }
     }
     logfile("Done with", mtd, ".\n")
