@@ -13,13 +13,13 @@ if(host == "impact1.stat.iastate.edu"){
   reps.on.server = 1:2
 } else if(host == "impact2.stat.iastate.edu"){ 
   ncpus = 6
-  reps.on.server = 1:6
+  reps.on.server = 1:4
 } else if(host == "impact3.stat.iastate.edu"){
-  ncpus = 4
-  reps.on.server = 7:10
+  ncpus = 2
+  reps.on.server = 5:6
 } else if(host == "impact4.stat.iastate.edu"){
-  ncpus = 8
-  reps.on.server = 5:10
+  ncpus = 6
+  reps.on.server = 7:10
 } else {
   ncpus = 2
   reps.on.server = 1:2
