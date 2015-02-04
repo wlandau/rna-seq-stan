@@ -84,10 +84,10 @@ ranks1dataset = function(mtd, size, rep, counts, group, ncpus = 2){
     alp = (group == "parent2") - (group == "parent1")
     del = as.integer(group == "hybrid")
 
-    size <- calcNormFactors(counts)
+    nsize <- calcNormFactors(counts)
     libsize <- apply(counts, 2, sum)
     libsize <- libsize/exp(mean(log(libsize)))
-    logsize <- log(size) + log(libsize)
+    logsize <- log(nsize) + log(libsize)
     logsize <- logsize - mean(logsize)
     logsize <<- logsize
 
@@ -153,10 +153,10 @@ str(mu.parent1)
 str(mu.parent2)
 str(mu.hybrid)
 
-    size <- calcNormFactors(counts)
+    nsize <- calcNormFactors(counts)
     libsize <- apply(counts, 2, sum)
     libsize <- libsize/exp(mean(log(libsize)))
-    logsize <- log(size) + log(libsize)
+    logsize <- log(nsize) + log(libsize)
     logsize <- logsize - mean(logsize)
     logsize <<- logsize
 
