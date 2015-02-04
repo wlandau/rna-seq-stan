@@ -10,16 +10,16 @@ host = System$getHostname()
 
 if(host == "impact1.stat.iastate.edu"){
   ncups = 12
-  reps.on.server = 1:2
+  reps.on.server = 1:3
 } else if(host == "impact2.stat.iastate.edu"){ 
   ncpus = 6
   reps.on.server = 1:4
 } else if(host == "impact3.stat.iastate.edu"){
-  ncpus = 2
-  reps.on.server = 5:6
+  ncpus = 6
+  reps.on.server = 5:7
 } else if(host == "impact4.stat.iastate.edu"){
   ncpus = 6
-  reps.on.server = 7:10
+  reps.on.server = 8:10
 } else {
   ncpus = 2
   reps.on.server = 1:2
