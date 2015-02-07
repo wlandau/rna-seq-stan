@@ -50,7 +50,7 @@ unpack.stan = function(mtds){
 
 #      probs = 1 - pmax(x$phph, x$plph)
 #      probs = 1 - (x$phph + x$plph)
-    probs = 1 - x$new_prob
+    probs = 1- x$new_prob
      
       names(probs) = x$geneid
       saveRDS(probs, paste("../ranks/", file.name(mtd, x$sample.size[1], x$sim[1]), sep=""))

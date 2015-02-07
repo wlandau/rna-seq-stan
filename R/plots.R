@@ -3,10 +3,14 @@ trim.whitespace = function(x){
 }
 
 figdir = function(mtd = work.parms("mtd")){
-  m = paste(paste(mtd, collapse="-"))
-  if(length(mtd))
-    m = paste("-", m, sep="")
-  dr = paste("../fig", m, "/", sep="")
+  if(length(mtd) == length(work.parms("mtd")) && all(sort(mtd) == sort(work.parms("mtd")))){
+    dr = "../fig-all/"
+  } else {
+    m = paste(paste(mtd, collapse="-"))
+    if(length(mtd))
+      m = paste("-", m, sep="")
+    dr = paste("../fig", m, "/", sep="")
+  }
   if(!file.exists(dr))
     dir.create(dr)
   return(dr)
