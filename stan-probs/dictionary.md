@@ -4,7 +4,7 @@ Each data frame (RDS file) in this directory corresponds to the simulated datase
 
 #### geneid
 
-ID of each gene (row): for example, "AC148152.3_FG001"
+ID of each gene (row): for example, "AC148152.3_FG001" 
 
 #### phph
 
