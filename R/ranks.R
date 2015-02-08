@@ -102,18 +102,25 @@ ranks1dataset = function(mtd, size, rep, counts, group, ncpus = 2){
     # ncpus doesn't work in FitAllShrink
     fit = FitAllShrink(forms = form, dat = counts, shrinksimul = priors, fams="nb", finalprior = T, lincomb = lc) 
 
-    postsLc1 = BFUpdatePosterior(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
-    postsLc2 = BFUpdatePosterior(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
+#    postsLc1 = BFUpdatePosterior(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
+#    postsLc2 = BFUpdatePosterior(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
+
+    postsLc1 = andyspost(fit, priors, shrinklc = "lc1", ncpus = ncpus) # LPH
+    postsLc2 = andyspost(fit, priors, shrinklc = "lc2", ncpus = ncpus) # HPH
 
     post1 = SummaryWrap(postsLc1, thr = 0, direction = "greater", ncpus = ncpus) # P(alp + del > 0) = P(del > -alp)
     post2 = SummaryWrap(postsLc2, thr = 0, direction = "lesser", ncpus = ncpus) # P(alp - del < 0) = P(del > alp)  
     post3 = SummaryWrap(postsLc2, thr = 0, direction = "greater", ncpus = ncpus) # P(alp - del > 0) = P(del < alp)
     post4 = SummaryWrap(postsLc1, thr = 0, direction = "lesser", ncpus = ncpus) # P(alp + del < 0) = P(del < -alp)
 
-    postsAlp = BFUpdatePosterior(fit, priors, shrinkpara = "alp", ncpus = ncpus)
+#    postsAlp = BFUpdatePosterior(fit, priors, shrinkpara = "alp", ncpus = ncpus)
+    postsAlp = andyspost(fit, priors, shrinkpara = "alp", ncpus = ncpus)
+
     postmeansAlp = SummaryWrap(postsAlp, summary="postmean", ncpus = ncpus)
 
-    postsDel = BFUpdatePosterior(fit, priors, shrinkpara = "del", ncpus = ncpus)
+#    postsDel = BFUpdatePosterior(fit, priors, shrinkpara = "del", ncpus = ncpus)
+    postsDel = andyspost(fit, priors, shrinkpara = "del", ncpus = ncpus)
+
     postmeansDel = SummaryWrap(postsDel, summary="postmean", ncpus = ncpus)
 
     df = cbind(postmeansAlp, postmeansDel, post1, post2, post3, post4)
