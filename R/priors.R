@@ -8,17 +8,17 @@ for(size in c(4, 8, 16)) for(rep in 1:10){
       size = size,
       rep = rep,
       mean.phi = x$pmlist$mufixed,
-      mean.alpha = x$pmlist$mualpha,
-      mean.delta = x$pmlist$mudelta,
+      mean.alpha = x$pmlist$mualp,
+      mean.delta = x$pmlist$mudel,
       mean.dispersion = x$pmlist$mudisp,
       prec.phi = x$pmlist$precfixed,
-      prec.alpha = x$pmlist$precmu.alpha,
-      prec.delta = x$pmlist$precmu.delta,
+      prec.alpha = x$pmlist$precalpha,
+      prec.delta = x$pmlist$precdelta,
       prec.dispersion = x$pmlist$precdisp
     ))
   }
 }
-  saveRDS(as.data.frame(d), "../priors/priors-ShrinkBayes.rds")
+  saveRDS(as.data.frame(d), "../priors/priors-ShrinkBayes-phi-alpha-delta.rds")
 }
 
 collectShrinkBayesMu = function(){
