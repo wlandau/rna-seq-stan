@@ -1,4 +1,4 @@
-collectShrinkBayes = function(){
+collectShrinkBayesPhiAlpDel = function(){
 d = NULL
 for(size in c(4, 8, 16)) for(rep in 1:10){
   file = paste("../priors/ShrinkBayes-", size, "-", rep, ".rds", sep="")
@@ -12,8 +12,8 @@ for(size in c(4, 8, 16)) for(rep in 1:10){
       mean.delta = x$pmlist$mudel,
       mean.dispersion = x$pmlist$mudisp,
       prec.phi = x$pmlist$precfixed,
-      prec.alpha = x$pmlist$precalpha,
-      prec.delta = x$pmlist$precdelta,
+      prec.alpha = x$pmlist$precalp,
+      prec.delta = x$pmlist$precdel,
       prec.dispersion = x$pmlist$precdisp
     ))
   }
