@@ -21,6 +21,28 @@ save.fdr.1rep = function(.fdr, who, mtd, size, rep, upper = 0.15, npts = 100){
   saveRDS(.fdr, paste("../fdr/", who, "-", file.name(mtd, size, rep), sep=""))
 }
 
+collect.fdr = function(who = "dan"){
+  .fdr = loopify(function(mtd, size, rep){
+    n = paste("../fdr/", who, "-", file.name(mtd, size, rep), sep="")
+    if(file.exists(n))
+      readRDS(n)
+  }, work.parms("mtd"), work.parms("size"), work.parms("rep"))
+
+  ret = data.frame(
+    cutoff = do.call("c", .fdr$cutoff),
+    one.minus.cutoff = 1 - do.call("c", .fdr$cutoff),
+    fdr = do.call("c", .fdr$fdr),
+    fdr.minus.cutoff = do.call("c", .fdr$fdr.minus.cutoff),
+    mtd = ordered(do.call("c", lapply(.fdr$mtd, as.character)), levels = rev(work.parms("mtd"))),
+    size.short = ordered(do.call("c", .fdr$size), work.parms("size")),
+    size = ordered(do.call("c", .fdr$size), labels = paste(work.parms("size"), "samples / group")),
+    rep = do.call("c", .fdr$rep)
+  )
+
+  ret = ret[is.finite(ret$fdr),]
+  saveRDS(ret, paste("../fdr/", who, ".rds", sep=""))
+}
+
 fdr = function(people = c("dan", "jarad"), 
                       mtd = work.parms("mtd"), size = work.parms("size"), rep = work.parms("rep")){
 
@@ -44,26 +66,4 @@ fdr = function(people = c("dan", "jarad"),
     
     collect.fdr(who)
   }
-}
-
-collect.fdr = function(who = "dan"){
-  .fdr = loopify(function(mtd, size, rep){
-    n = paste("../fdr/", who, "-", file.name(mtd, size, rep), sep="")
-    if(file.exists(n))
-      readRDS(n)
-  }, work.parms("mtd"), work.parms("size"), work.parms("rep"))
-
-  ret = data.frame(
-    cutoff = do.call("c", .fdr$cutoff),
-    one.minus.cutoff = 1 - do.call("c", .fdr$cutoff),
-    fdr = do.call("c", .fdr$fdr),
-    fdr.minus.cutoff = do.call("c", .fdr$fdr.minus.cutoff),
-    mtd = ordered(do.call("c", lapply(.fdr$mtd, as.character)), levels = rev(work.parms("mtd"))),
-    size.short = ordered(do.call("c", .fdr$size), work.parms("size")),
-    size = ordered(do.call("c", .fdr$size), labels = paste(work.parms("size"), "samples / group")),
-    rep = do.call("c", .fdr$rep)
-  )
-
-  ret = ret[is.finite(ret$fdr),]
-  saveRDS(ret, paste("../fdr/", who, ".rds", sep=""))
 }
