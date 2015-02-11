@@ -233,6 +233,7 @@ colnames(df) = c("p1", "p2", "h", "p1.g.h", "p2.g.h", "h.g.p1", "h.g.p2")
 
   s = proc.time()
   logfile(paste(s - t, collapse = " "))
+  names(ret) = rownames(counts)
   return(ret)
 }
 

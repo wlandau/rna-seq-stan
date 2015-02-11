@@ -17,7 +17,7 @@ Same as phph, but for low parent heterosis.
 
 # post_probs_horseshoe.rds
 
-A single data frame (RDS). Rows correspond to a gene in a particular simulation. Only involved one sample.size setting.
+A single data frame (RDS). Rows correspond to a gene in a particular simulation. Only involved one sample.size (16) setting.
 
 #### sample.size
 
@@ -70,9 +70,6 @@ Posterior probability of HPH
 
 Posterior probability of LPH
 
-
-# post_probs.rds
-DELETE
 
 # rev_probs_laplace.rds
 A single data frame (RDS). Rows correspond to a gene in a particular simulation. This file was result of multivariate normal prior on mu1, mu2, mu3.
@@ -172,6 +169,30 @@ Posterior probability of HPH
 Posterior probability of LPH
 
 
-# stan_probs.rds
+# stan_probs
 
-DELETE?
+A single data frame (RDS). Rows correspond to a gene in a particular simulation.
+
+#### sample.size
+
+Sample size setting for the simulation. num type, one of 4, 8, 16. 
+
+#### sim
+
+ID for simulation within a sample.size. int type, one of 1:10. 
+
+#### sim_gene
+
+ID for gene within a simulation. one of 1:25000.
+
+#### geneid
+
+ID of each gene; for example, "AC148152.3_FG001"
+
+#### phph
+
+Posterior probability of HPH
+
+#### plph
+
+Posterior probability of LPH
