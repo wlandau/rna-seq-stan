@@ -7,10 +7,13 @@ source("setup.R")
 #  simulator(size = size)
 
 #unpack.stan()
-ranks(mtds = c(    "edgeR", 
+ranks(mtds = c(    
+    "edgeR", 
     "baySeq", 
     "ShrinkBayes",
-    "ShrinkBayesMu", ), reps = reps.on.server, ncpus = ncpus)
+    "ShrinkBayesMu"
+), 
+reps = reps.on.server, ncpus = ncpus)
 #ranks(mtds = "ShrinkBayesMu", reps = 1, ncpus = 1)
 #rocs(mtd = c("stan_corr", "stan", "stan_laplace"))
 #aucs()
