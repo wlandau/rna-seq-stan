@@ -15,7 +15,11 @@ work.parms = function(item){
     "stan"                           # ../stan-probs/stan_probs_corr.rds
   )
 
+  simno = 2
+
   switch(item, 
+             "sim" = simno,
+             "path" = paste("../simulations/sim", simno, "/", sep=""),
              "mtd" = ordered(mtd, levels = mtd),
              "size" = c(4, 8, 16),
              "rep" = 1:10,

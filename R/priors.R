@@ -1,7 +1,7 @@
 collectShrinkBayesPhiAlpDel = function(){
 d = NULL
 for(size in c(4, 8, 16)) for(rep in 1:10){
-  file = paste("../priors/ShrinkBayes-", size, "-", rep, ".rds", sep="")
+  file = paste(work.parms("path"), "priors/ShrinkBayes-", size, "-", rep, ".rds", sep="")
   if(file.exists(file)){
     x = readRDS(file)
     d = rbind(d, c(
@@ -18,7 +18,7 @@ for(size in c(4, 8, 16)) for(rep in 1:10){
     ))
   }
 }
-  saveRDS(as.data.frame(d), "../priors/priors-ShrinkBayes-phi-alpha-delta.rds")
+  saveRDS(as.data.frame(d), paste(work.parms("path"), "priors/priors-ShrinkBayes-phi-alpha-delta.rds", sep=""))
 }
 
 collectShrinkBayesMu = function(){

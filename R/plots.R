@@ -4,12 +4,12 @@ trim.whitespace = function(x){
 
 figdir = function(mtd = work.parms("mtd")){
   if(length(mtd) == length(work.parms("mtd")) && all(sort(mtd) == sort(work.parms("mtd")))){
-    dr = "../fig-all/"
+    dr = paste(work.parms("path"), "fig-all/", sep="")
   } else {
     m = paste(paste(mtd, collapse="-"))
     if(length(mtd))
       m = paste("-", m, sep="")
-    dr = paste("../fig", m, "/", sep="")
+    dr = paste(work.parms("path"), "fig", m, "/", sep="")
   }
   if(!file.exists(dr))
     dir.create(dr)
@@ -30,7 +30,7 @@ relevel = function(d){
 
 exampleROCdf = function(upper = 1e-1, mtd = work.parms("mtd")){
   l = loopify(function(mtd, size, rep){
-    .roc = readRDS(paste("../roc/", file.name(mtd, size, 1), sep=""))
+    .roc = readRDS(paste(work.parms("path"), "roc/", file.name(mtd, size, 1), sep=""))
     .roc = .roc[.roc$fpr <= upper,]
     .roc$mtd = mtd
     .roc$size = size
@@ -72,7 +72,7 @@ plotExampleROC = function(upper = c(1e-1, 1), mtd = work.parms("mtd")){
 
 plotAUCfacet = function(facet.by.size = c(T, F), mtd = work.parms("mtd")){
   Vectorize(function(facet.by.size){
-    df = readRDS("../auc/auc.rds")
+    df = readRDS(paste(work.parms("path"), "auc/auc.rds", sep=""))
     df = df[df$mtd %in% mtd, ]
     df$mtd = ordered(df$mtd, work.parms("mtd"))
 
@@ -106,7 +106,7 @@ plotAUCfacet = function(facet.by.size = c(T, F), mtd = work.parms("mtd")){
 
 plotAUCcolor = function(jitter = c(T, F), mtd = work.parms("mtd")){
   Vectorize(function(jitter){
-    df = readRDS("../auc/auc.rds")
+    df = readRDS(paste(work.parms("path"), "auc/auc.rds", sep=""))
     df = df[df$mtd %in% mtd, ]
     df$mtd = ordered(df$mtd, rev(mtd))
 
@@ -138,7 +138,7 @@ reverse.x = c(" ", " no "), mtd = work.parms("mtd")){
   grid = expand.grid(who, facet.direction, y.axis, reverse.x)
   
   Vectorize(function(who, facet.direction, y.axis, reverse.x){
-    d = readRDS(paste("../fdr/",who, ".rds", sep=""))
+    d = readRDS(paste(work.parms("path"), "fdr/",who, ".rds", sep=""))
     d = d[d$mtd %in% mtd, ]
 
    dr = figdir(mtd)
@@ -182,7 +182,7 @@ reverse.x = c(" ", " no ")){
    dr = figdir(mtd)  
 
   Vectorize(function(who, mtd, y.axis, reverse.x){
-    d = readRDS(paste("../fdr/",who, ".rds", sep=""))
+    d = readRDS(paste(work.parms("path"), "fdr/",who, ".rds", sep=""))
     d = d[d$mtd == mtd,]
     d = relevel(d)
 

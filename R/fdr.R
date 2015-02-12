@@ -18,12 +18,12 @@ save.fdr.1rep = function(.fdr, who, mtd, size, rep, upper = 0.15, npts = 100){
   .fdr$rep = rep
   .fdr = .fdr[.fdr$cutoff <= upper,]
 
-  saveRDS(.fdr, paste("../fdr/", who, "-", file.name(mtd, size, rep), sep=""))
+  saveRDS(.fdr, paste(work.parms("path"), "fdr/", who, "-", file.name(mtd, size, rep), sep=""))
 }
 
 collect.fdr = function(who = "dan"){
   .fdr = loopify(function(mtd, size, rep){
-    n = paste("../fdr/", who, "-", file.name(mtd, size, rep), sep="")
+    n = paste(work.parms("path"), "fdr/", who, "-", file.name(mtd, size, rep), sep="")
     if(file.exists(n))
       readRDS(n)
   }, work.parms("mtd"), work.parms("size"), work.parms("rep"))
@@ -40,7 +40,7 @@ collect.fdr = function(who = "dan"){
   )
 
   ret = ret[is.finite(ret$fdr),]
-  saveRDS(ret, paste("../fdr/", who, ".rds", sep=""))
+  saveRDS(ret, paste(work.parms("path"), "fdr/", who, ".rds", sep=""))
 }
 
 fdr = function(people = c("dan", "jarad"), 
@@ -51,8 +51,8 @@ fdr = function(people = c("dan", "jarad"),
       print(paste("FDR", who, mtd, size, rep))
       
       d = data.frame(
-        ranks = readRDS(paste("../ranks/", file.name(mtd, size, rep), sep="")),
-        truth = 1 - abs(readRDS(paste("../simulations/", file.name("truth", size, rep), sep=""))))
+        ranks = readRDS(paste(work.parms("path"), "ranks/", file.name(mtd, size, rep), sep="")),
+        truth = 1 - abs(readRDS(paste(work.parms("path"), "truth/", file.name("truth", size, rep), sep=""))))
       
       d = d[order(d$ranks),]
      

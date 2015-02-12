@@ -2,7 +2,7 @@ for(file in list.files())
   if(file != "setup.R" && file != "workflow.R" && tolower(substr(x = file, start = nchar(file) - 1, stop = nchar(file))) == ".r")
     source(file)
 
-for(dir in c("../auc", "../data/", "../fdr", "../fig",  "../log", "../priors", "../pvals", "../roc", "../simulations"))
+for(dir in paste(work.parms("path"), c("auc", "fdr", "log", "priors", "ranks", "roc"), sep=""))
   if(!file.exists(dir))
     dir.create(dir)
 

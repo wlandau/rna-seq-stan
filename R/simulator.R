@@ -37,7 +37,7 @@ simulator = function(rep = 1:10, size = 4, keep = work.parms("keep")){
     counts.keep = counts.t[keep,]
     truth.keep = truth[keep]
     
-    saveRDS(counts.keep, file=sprintf("../simulations/sim-%i-%i.rds", size, rep))
-    saveRDS(truth.keep, file=sprintf("../simulations/truth-%i-%i.rds", size, rep))
+    saveRDS(counts.keep, file=paste(work.parms("path"), "datsets/sim", size, "-", rep, ".rds", sep=""))
+    saveRDS(truth.keep, file=paste(work.parms("path"), "truth/truth", size, "-", rep, ".rds", sep=""))
   }, "rep")(size, rep)
 }
