@@ -218,8 +218,8 @@ reverse.x = c(" ", " no ")){
 
 makePlots = function(mtd = work.parms("mtd")){
   plotExampleROC(mtd = mtd)
-  plotAUCcolor(mtd = mtd)
-  plotAUCfacet(mtd = mtd)
-  plotFDRfacet(mtd = mtd)
+#  plotAUCcolor(mtd = mtd)
+  plotAUCfacet(mtd = mtd, facet.by.size=T)
+  plotFDRfacet(mtd = mtd, facet.direction = T)
 #  plotFDRindiv(mtd = mtd)
 }
