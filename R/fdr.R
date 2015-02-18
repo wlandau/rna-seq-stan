@@ -13,9 +13,11 @@ save.fdr.1rep = function(.fdr, who, mtd, size, rep, upper = 0.15, npts = 100){
   .fdr = data.frame(cutoff = apx$x, fdr = apx$y)
 
   .fdr$fdr.minus.cutoff = .fdr$fdr - .fdr$cutoff
-  .fdr$mtd = mtd
-  .fdr$size = size
-  .fdr$rep = rep
+  .fdr$one.minus.cutoff = 1 - .fdr$cutoff
+  .fdr$mtd = ordered(mtd, levels = rev(work.parms("mtd")))
+  .fdr$size.short = ordered(size, work.parms("size"))
+  .fdr$rep = ordered(rep, work.parms("rep"))
+
   .fdr = .fdr[.fdr$cutoff <= upper,]
 
   saveRDS(.fdr, paste(work.parms("path"), "fdr/", who, "-", file.name(mtd, size, rep), sep=""))
@@ -28,19 +30,12 @@ collect.fdr = function(who = "dan"){
       readRDS(n)
   }, work.parms("mtd"), work.parms("size"), work.parms("rep"))
 
-  ret = data.frame(
-    cutoff = do.call("c", .fdr$cutoff),
-    one.minus.cutoff = 1 - do.call("c", .fdr$cutoff),
-    fdr = do.call("c", .fdr$fdr),
-    fdr.minus.cutoff = do.call("c", .fdr$fdr.minus.cutoff),
-    mtd = ordered(do.call("c", lapply(.fdr$mtd, as.character)), levels = rev(work.parms("mtd"))),
-    size.short = ordered(do.call("c", .fdr$size), work.parms("size")),
-    size = ordered(do.call("c", .fdr$size), labels = paste(work.parms("size"), "samples / group")),
-    rep = do.call("c", .fdr$rep)
-  )
+  .fdr = lapply(.fdr, function(x){x[[1]]})
+  .fdr = do.call("rbind", .fdr)
+  .fdr$size = ordered(.fdr$size.short, labels = paste(work.parms("size"), "samples / group"))
 
-  ret = ret[is.finite(ret$fdr),]
-  saveRDS(ret, paste(work.parms("path"), "fdr/", who, ".rds", sep=""))
+  .fdr = .fdr[is.finite(.fdr$fdr),]
+  saveRDS(.fdr, paste(work.parms("path"), "fdr/", who, ".rds", sep=""))
 }
 
 fdr = function(people = c("dan", "jarad"), 

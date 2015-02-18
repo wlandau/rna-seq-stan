@@ -35,7 +35,7 @@ exampleROCdf = function(upper = 1e-1, mtd = work.parms("mtd")){
     .roc$mtd = mtd
     .roc$size = size
     .roc
-  }, rep = 1)
+  }, mtd = mtd, rep = 1)
 
   d = data.frame(
     fpr = do.call("c", l$fpr),
@@ -221,5 +221,5 @@ makePlots = function(mtd = work.parms("mtd")){
   plotAUCcolor(mtd = mtd)
   plotAUCfacet(mtd = mtd)
   plotFDRfacet(mtd = mtd)
-  plotFDRindiv(mtd = mtd)
+#  plotFDRindiv(mtd = mtd)
 }
