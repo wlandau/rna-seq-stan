@@ -14,7 +14,7 @@ save.fdr.1rep = function(.fdr, who, mtd, size, rep, upper = 0.15, npts = 100){
 
   .fdr$fdr.minus.cutoff = .fdr$fdr - .fdr$cutoff
   .fdr$one.minus.cutoff = 1 - .fdr$cutoff
-  .fdr$mtd = ordered(mtd, levels = rev(work.parms("mtd")))
+  .fdr$mtd = mtd
   .fdr$size.short = ordered(size, work.parms("size"))
   .fdr$rep = ordered(rep, work.parms("rep"))
 
@@ -24,15 +24,19 @@ save.fdr.1rep = function(.fdr, who, mtd, size, rep, upper = 0.15, npts = 100){
 }
 
 collect.fdr = function(who = "dan"){
-  .fdr = loopify(function(mtd, size, rep){
+  .fdr.list = loopify(function(mtd, size, rep){
     n = paste(work.parms("path"), "fdr/", who, "-", file.name(mtd, size, rep), sep="")
     if(file.exists(n))
       readRDS(n)
   }, work.parms("mtd"), work.parms("size"), work.parms("rep"))
 
-  .fdr = lapply(.fdr, function(x){x[[1]]})
-  .fdr = do.call("rbind", .fdr)
-  .fdr$size = ordered(.fdr$size.short, labels = paste(work.parms("size"), "samples / group"))
+  .fdr = list()
+  for(n in names(.fdr.list))
+    .fdr[[n]] = do.call("c", lapply(.fdr.list[[n]], as.vector))
+  .fdr = as.data.frame(.fdr)
+
+  .fdr$size = ordered(paste(as.character(.fdr$size.short), "samples / group"), labels = paste(work.parms("size"), "samples / group"))
+  .fdr$mtd = ordered(.fdr$mtd, levels = rev(work.parms("mtd")))
 
   .fdr = .fdr[is.finite(.fdr$fdr),]
   saveRDS(.fdr, paste(work.parms("path"), "fdr/", who, ".rds", sep=""))

@@ -5,14 +5,21 @@ work.parms = function(item){
     "ShrinkBayes",
     "ShrinkBayesMu", 
 
-    "stan_laplace_mvn",     # ../stan-probs/laplace_mvn/pprob_lap_mvn...
-#    "stan_horseshoe",        # ../stan-probs/post_probs_horseshoe.rds, only has sample.size = 16
-    "stan_laplace",             # ../stan-probs/post_probs_laplace.rds 
-    "rev_laplace",              # ../stan-probs/rev_probs_laplace.rds
-    "rev_probs_mu_cov",  # ../stan-probs/rev_probs_mu_cov.rds
-    "revised_pvals",           # ../stan-probs/revised_pvals.rds
-    "stan_corr",                  # ../stan-probs/stan_probs_corr.rds
-    "stan"                           # ../stan-probs/stan_probs_corr.rds
+# simulation 1
+#
+#    "stan_laplace_mvn",     # ../simulations/sim1/stan-probs/laplace_mvn/pprob_lap_mvn...
+#    "stan_horseshoe",        # ../simulations/sim1/stan-probs/post_probs_horseshoe.rds, only has sample.size = 16
+#    "stan_laplace",             # ../simulations/sim1/stan-probs/post_probs_laplace.rds 
+#   "rev_laplace",               # ../simulations/sim1/stan-probs/rev_probs_laplace.rds
+#   "rev_probs_mu_cov",   # ../simulations/sim1/stan-probs/rev_probs_mu_cov.rds
+#    "revised_pvals",           # ../simulations/sim1/stan-probs/revised_pvals.rds
+#    "stan_corr",                  # ../simulations/sim1/stan-probs/stan_probs_corr.rds
+#    "stan"                           # ../simulations/sim1/stan-probs/stan_probs_corr.rds
+
+# simulation 2
+  "stan_laplace",                 # ../simulations/sim2/stan-probs/laplace_normal/posts_laplace...
+  "stan_laplace_phimix"      # ../simulations/sim2/stan-probs/laplace_normal/posts_phimix...
+
   )
 
   simno = 2
