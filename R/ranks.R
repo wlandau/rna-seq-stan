@@ -281,7 +281,7 @@ colnames(df) = c("p1", "p2", "h", "p1.g.h", "p2.g.h", "h.g.p1", "h.g.p2")
   g1 = group
   group = (g1 == "parent1") + 2*(g1 == "hybrid") + 3*(g1 == "parent2")
 
-  o = heterosis(y = counts, group = group, M = 1e5, burnin = 1e5, rhoSampler = 0, sigRhoSampler = 0)
+  o = heterosis(y = counts, group = group, M = 1e4, burnin = 1e5, rhoSampler = 0, sigRhoSampler = 0)
   ret = 1 - (o$hph + o$lph)
 
   }
