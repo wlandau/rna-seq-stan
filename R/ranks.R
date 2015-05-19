@@ -229,6 +229,61 @@ colnames(df) = c("p1", "p2", "h", "p1.g.h", "p2.g.h", "h.g.p1", "h.g.p2")
       else if(x["h"] < x["p2"] && (x["p2"] <= x["p1"]))
         return(x["p2.g.h"])
     })
+
+  } else if(mtd == "DESeq2"){
+
+    colData = DataFrame(row.names=paste("row_", 1:(3*size), sep=""),
+      Treatment = factor(rep(c("parent1", "parent2", "hybrid"), each = size))
+    )
+
+    se = SummarizedExperiment(assays = SimpleList(counts = counts), colData = colData)
+
+    dds <- DESeqDataSet(se = se, design = ~ Treatment - 1)
+    dds <- DESeq(dds, betaPrior = F)
+
+    cf = coef(dds)
+
+    p1 = cf[, "Treatmentparent1"]
+    p2 = cf[, "Treatmentparent2"]
+    h = cf[, "Treatmenthybrid"]
+
+    p1.g.h = results(dds, lfcThreshold = dim(counts)[1], altHypothesis = "greater", 
+      contrast = c(Treatmenthybrid = -1, Treatmentparent1 = 1, Treatmentparent2 = 0))$padj
+
+    h.g.p2 = results(dds, lfcThreshold = dim(counts)[1], altHypothesis = "less", 
+      contrast = c(Treatmenthybrid = -1, Treatmentparent1 = 0, Treatmentparent2 = 1))$padj
+
+    p2.g.h = results(dds, lfcThreshold = dim(counts)[1], altHypothesis = "greater", 
+      contrast = c(Treatmenthybrid = -1, Treatmentparent1 = 0, Treatmentparent2 = 1))$padj
+
+    h.g.p1 = results(dds, lfcThreshold = dim(counts)[1], altHypothesis = "less", 
+      contrast = c(Treatmenthybrid = -1, Treatmentparent1 = 1, Treatmentparent2 = 0))$padj
+
+    df = cbind(p1, p2, h, p1.g.h, p2.g.h, h.g.p1, h.g.p2)
+
+    ret = apply(df, 1, function(x){
+      if((min(x["p1"], x["p2"]) <= x["h"]) && (x["h"] <= max(x["p1"], x["p2"])))
+        return(0)
+      else if(x["h"] > x["p1"] && (x["p1"] >= x["p2"]))
+        return(x["h.g.p1"])
+      else if(x["h"] > x["p2"] && (x["p2"] >= x["p1"]))
+        return(x["h.g.p2"])
+      else if(x["h"] < x["p1"] && (x["p1"] <= x["p2"]))
+        return(x["p1.g.h"])
+      else if(x["h"] < x["p2"] && (x["p2"] <= x["p1"]))
+        return(x["p2.g.h"])
+      else
+        return(1)
+    })
+
+  } else if(mtd == "fullyBayes"){
+
+  g1 = group
+  group = (g1 == "parent1") + 2*(g1 == "hybrid") + 3*(g1 == "parent2")
+
+  o = heterosis(y = counts, group = group, M = 1e5, burnin = 1e5, rhoSampler = 0, sigRhoSampler = 0)
+  ret = 1 - (o$hph + o$lph)
+
   }
 
   s = proc.time()

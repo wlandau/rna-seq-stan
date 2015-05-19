@@ -16,7 +16,7 @@ if(host == "impact1.stat.iastate.edu"){
   reps.on.server = 1:4
 } else if(host == "impact3.stat.iastate.edu"){
   ncpus = 6
-  reps.on.server = 5:7
+  reps.on.server = 1:10
 } else if(host == "impact4.stat.iastate.edu"){
   ncpus = 6
   reps.on.server = 8:10
