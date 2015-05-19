@@ -8,10 +8,11 @@ source("setup.R")
 
 #unpack.stan()
 ranks(mtds = c(    
-    "edgeR", 
-    "baySeq", 
-    "ShrinkBayes",
-    "ShrinkBayesMu"
+#    "edgeR", 
+#    "baySeq", 
+#    "ShrinkBayes",
+#    "ShrinkBayesMu"
+   "fullyBayes"
 ), 
 reps = reps.on.server, ncpus = ncpus)
 #ranks(mtds = "ShrinkBayesMu", reps = 1, ncpus = 1)
