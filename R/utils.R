@@ -4,7 +4,7 @@ work.parms = function(item){
     "baySeq", 
     "ShrinkBayes",
     "ShrinkBayesMu", 
-    "DESeq2",
+#    "DESeq2",
 
 # simulation 1
 #
@@ -19,7 +19,7 @@ work.parms = function(item){
 
 # simulation 2
   "stan_laplace",                 # ../simulations/sim2/stan-probs/laplace_normal/posts_laplace...
-  "stan_laplace_phimix",      # ../simulations/sim2/stan-probs/laplace_normal/posts_phimix...
+#  "stan_laplace_phimix",      # ../simulations/sim2/stan-probs/laplace_normal/posts_phimix...
   "fullyBayes"
 
   )
