@@ -1,10 +1,22 @@
-library(ggplot2)
-library(plyr)
-library(pracma)
-library(R.utils)
+is.installed = function(pkg){
+  is.element(pkg, installed.packages()[,1])
+} 
 
-library(edgeR)
-library(baySeq)
-library(ShrinkBayes)
-#library(DESeq2)
-library(heterosis)
+safeLoad = Vectorize(function(pkg){
+  if(is.installed(pkg))
+    library(pkg, character.only = T)
+  else
+    print(paste(pkg, "package not found."))
+}, "pkg")
+
+safeLoad(c(
+  "ggplot2",
+  "plyr",
+  "pracma",
+  "R.utils",
+  "edgeR",
+  "baySeq",
+  "ShrinkBayes",
+  "DESeq2",
+  "heterosis"
+))
