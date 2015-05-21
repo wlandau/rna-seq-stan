@@ -220,6 +220,6 @@ makePlots = function(mtd = work.parms("mtd")){
   plotExampleROC(mtd = mtd)
 #  plotAUCcolor(mtd = mtd)
   plotAUCfacet(mtd = mtd)
-  plotFDRfacet(mtd = mtd)
+#  plotFDRfacet(mtd = mtd)
 #  plotFDRindiv(mtd = mtd)
 }
