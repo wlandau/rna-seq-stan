@@ -7,7 +7,7 @@ work.parms = function(item){
     "baySeq", 
     "ShrinkBayes",
     "ShrinkBayesMu", 
-    "DESeq2"
+    "DESeq2",
     "fullyBayes"
   )
 
