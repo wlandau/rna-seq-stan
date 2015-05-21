@@ -1,6 +1,6 @@
 work.parms = function(item){
 
-  simno = 1
+  simno = 2
 
   mtd = c(
     "edgeR", 
