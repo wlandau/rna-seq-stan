@@ -232,9 +232,7 @@ colnames(df) = c("p1", "p2", "h", "p1.g.h", "p2.g.h", "h.g.p1", "h.g.p2")
 
   } else if(mtd == "DESeq2"){
 
-    colData = DataFrame(row.names=rownames(counts),
-      Treatment = factor(rep(c("parent1", "parent2", "hybrid"), each = size))
-    )
+    colData = DataFrame(Treatment = factor(rep(c("parent1", "parent2", "hybrid"), each = size)))
 
     se = SummarizedExperiment(assays = SimpleList(counts = counts), colData = colData)
 
