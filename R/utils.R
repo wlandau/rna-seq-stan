@@ -1,6 +1,6 @@
 work.parms = function(item){
 
-  simno = 2
+  simno = 1
 
   mtd = c(
     "edgeR", 
@@ -14,7 +14,7 @@ work.parms = function(item){
   if(simno == 1){
     mtd = c(mtd,
       "stan_laplace_mvn",     # ../simulations/sim1/stan-probs/laplace_mvn/pprob_lap_mvn...
-      "stan_horseshoe",        # ../simulations/sim1/stan-probs/post_probs_horseshoe.rds, only has sample.size = 16
+ #     "stan_horseshoe",        # ../simulations/sim1/stan-probs/post_probs_horseshoe.rds, only has sample.size = 16
       "stan_laplace",             # ../simulations/sim1/stan-probs/post_probs_laplace.rds 
       "rev_laplace",               # ../simulations/sim1/stan-probs/rev_probs_laplace.rds
       "rev_probs_mu_cov",   # ../simulations/sim1/stan-probs/rev_probs_mu_cov.rds

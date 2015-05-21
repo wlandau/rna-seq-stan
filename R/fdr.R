@@ -30,9 +30,11 @@ collect.fdr = function(who = "dan"){
       readRDS(n)
   }, work.parms("mtd"), work.parms("size"), work.parms("rep"))
 
-  .fdr = list()
+  .fdr.list.2 = list()
   for(n in names(.fdr.list))
-    .fdr[[n]] = do.call("c", lapply(.fdr.list[[n]], as.vector))
+    .fdr.list.2[[n]] = as.data.frame(lapply(.fdr.list[[n]][[1]], as.vector))
+
+  .fdr = do.call("rbind", .fdr.list.2) 
   .fdr = as.data.frame(.fdr)
 
   .fdr$size = ordered(paste(as.character(.fdr$size.short), "samples / group"), labels = paste(work.parms("size"), "samples / group"))

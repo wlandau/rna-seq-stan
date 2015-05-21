@@ -138,6 +138,8 @@ reverse.x = c(" ", " no "), mtd = work.parms("mtd")){
   grid = expand.grid(who, facet.direction, y.axis, reverse.x)
   
   Vectorize(function(who, facet.direction, y.axis, reverse.x){
+    print(paste(who, facet.direction, y.axis, reverse.x))
+
     d = readRDS(paste(work.parms("path"), "fdr/",who, ".rds", sep=""))
     d = d[d$mtd %in% mtd, ]
 
@@ -182,6 +184,8 @@ reverse.x = c(" ", " no ")){
    dr = figdir(mtd)  
 
   Vectorize(function(who, mtd, y.axis, reverse.x){
+    print(paste(who, mtd, y.axis, reverse.x))
+
     d = readRDS(paste(work.parms("path"), "fdr/",who, ".rds", sep=""))
     d = d[d$mtd == mtd,]
     d = relevel(d)
