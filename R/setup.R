@@ -22,5 +22,5 @@ if(host == "impact1.stat.iastate.edu"){
   reps.on.server = 8:10
 } else {
   ncpus = 2
-  reps.on.server = 1:2
+  reps.on.server = 1:10
 }
