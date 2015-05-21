@@ -247,16 +247,16 @@ colnames(df) = c("p1", "p2", "h", "p1.g.h", "p2.g.h", "h.g.p1", "h.g.p2")
     p2 = cf[, "Treatmentparent2"]
     h = cf[, "Treatmenthybrid"]
 
-    p1.g.h = results(dds, lfcThreshold = dim(counts)[1], altHypothesis = "greater", 
+    p1.g.h = results(dds, altHypothesis = "greater", 
       contrast = c(Treatmenthybrid = -1, Treatmentparent1 = 1, Treatmentparent2 = 0))$padj
 
-    h.g.p2 = results(dds, lfcThreshold = dim(counts)[1], altHypothesis = "less", 
+    h.g.p2 = results(dds, altHypothesis = "less", 
       contrast = c(Treatmenthybrid = -1, Treatmentparent1 = 0, Treatmentparent2 = 1))$padj
 
-    p2.g.h = results(dds, lfcThreshold = dim(counts)[1], altHypothesis = "greater", 
+    p2.g.h = results(dds, altHypothesis = "greater", 
       contrast = c(Treatmenthybrid = -1, Treatmentparent1 = 0, Treatmentparent2 = 1))$padj
 
-    h.g.p1 = results(dds, lfcThreshold = dim(counts)[1], altHypothesis = "less", 
+    h.g.p1 = results(dds, altHypothesis = "less", 
       contrast = c(Treatmenthybrid = -1, Treatmentparent1 = 1, Treatmentparent2 = 0))$padj
 
     df = cbind(p1, p2, h, p1.g.h, p2.g.h, h.g.p1, h.g.p2)

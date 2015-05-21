@@ -11,8 +11,9 @@ ranks(mtds = c(
 #    "edgeR", 
 #    "baySeq", 
 #    "ShrinkBayes",
-#    "ShrinkBayesMu"
-   "fullyBayes"
+#    "ShrinkBayesMu",
+#   "fullyBayes",
+     "DESeq2"
 ), 
 reps = reps.on.server, ncpus = ncpus)
 #ranks(mtds = "ShrinkBayesMu", reps = 1, ncpus = 1)
