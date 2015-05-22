@@ -3,8 +3,11 @@ fpr.point = Vectorize(function(cutoff, ranks, n){
 }, "cutoff")
 
 roc = function(ranks, truth){
+  ranks[is.na(ranks)] = 1
+
   truth = truth[order(ranks)]
   ranks = sort(ranks)
+
 
   ranks.false = ranks[truth == 0]
   ranks.true = ranks[truth != 0]
