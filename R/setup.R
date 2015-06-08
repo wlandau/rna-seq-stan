@@ -6,6 +6,8 @@ for(dir in paste(work.parms("path"), c("auc", "fdr", "log", "priors", "ranks", "
   if(!file.exists(dir))
     dir.create(dir)
 
+if(F){
+
 host = System$getHostname()
 
 if(host == "impact1.stat.iastate.edu"){
@@ -23,4 +25,6 @@ if(host == "impact1.stat.iastate.edu"){
 } else {
   ncpus = 2
   reps.on.server = 1:10
+}
+
 }
